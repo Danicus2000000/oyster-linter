@@ -1,0 +1,42 @@
+name: Build and Compile Oyster Linter VS Code Extension
+
+on:
+  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile TypeScript
+        run: npx tsc -p ./
+
+      - name: Lint code
+        run: npx tsc --noEmit
+
+      - name: Build with webpack
+        run: npx webpack --config webpack.config.js
+
+      - name: Package VS Code Extension
+        if: github.event_name != 'pull_request'
+        run: npx vsce package
+
+      - name: Upload VSIX artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: oyster-linter-vsix
+          path: "*.vsix"
