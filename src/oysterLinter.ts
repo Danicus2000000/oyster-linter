@@ -60,7 +60,7 @@ export function lintOysterDocument(
   for (let i = 0; i < doc.lineCount; i++) {
     const line = doc.lineAt(i);
     const text = line.text.trim();
-    if (!text || text.startsWith("//")) continue;
+    if (!text || text.startsWith("#")) continue;
     const match = text.match(/^(\w+)\s*\[(.*)\]$/);
     if (!match) {
       diagnostics.push(
