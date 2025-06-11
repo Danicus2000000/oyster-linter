@@ -19,40 +19,40 @@ export type CommandMap = Record<string, CommandSpec>;
 // Oyster 4S command spec
 export const commands: CommandMap = {
   Act_Append: {
-    description: "Append text to the current script",
-    required: [{ name: "text", type: "string", description: "Text to append" }],
+    description: "Append text to the current conversation",
+    required: [{ name: "text", type: "string", description: "Text to push to the conversation" }],
     optional: [
       {
         name: "instant",
         type: "bool",
         default: false,
-        description: "If true, append instantly without delay",
+        description: "If true, push all text instantly, rather than over time",
       },
       {
         name: "wait",
         type: "bool",
         default: true,
         description:
-          "If true, wait for the append to complete before continuing",
+          "If true, require user input before progressing to the next line",
       },
     ],
   },
   Act_Speak: {
-    description: "Make the character speak",
-    required: [{ name: "text", type: "string", description: "Text to speak" }],
+    description: "Replace the current conversation's text",
+    required: [{ name: "text", type: "string", description: "Text to push to the conversation" }],
     optional: [
       {
         name: "instant",
         type: "bool",
         default: false,
-        description: "If true, speak instantly without delay",
+        description: "If true, push all text instantly, rather than over time",
       },
       {
         name: "wait",
         type: "bool",
         default: true,
         description:
-          "If true, wait for the speech to complete before continuing",
+          "If true, require user input before progressing to the next line",
       },
     ],
   },
