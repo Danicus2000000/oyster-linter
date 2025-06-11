@@ -126,7 +126,7 @@ export const commands: CommandMap = {
     optional: [],
   },
   Give_Item: {
-    description: "Give an item to a person",
+    description: "Attempt to give the player an item, given the player cannot accept the item (e.g. full inventory), the game running Oyster should ensure that the item can be retrieved later in some way (e.g. GroveGame drops the item at the player's origin)",
     required: [
       { name: "itemName", type: "string", description: "Name of the item" },
     ],
