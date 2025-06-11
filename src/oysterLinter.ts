@@ -133,12 +133,12 @@ export const commands: CommandMap = {
     optional: [],
   },
   Check_Has: {
-    description: "Check if a person has a specific item",
+    description: "Checks Whether a given character has received a specific item, and jumps to line markers accordingly",
     required: [
       {
-        name: "personInventory",
+        name: "person",
         type: "string",
-        description: "Person's inventory to check",
+        description: "The person to check",
       },
       {
         name: "itemName",
@@ -146,14 +146,14 @@ export const commands: CommandMap = {
         description: "Name of the item to check",
       },
       {
-        name: "giftState",
+        name: "successMarker",
         type: "string",
-        description: "State of the gift to check",
+        description: "Name of line marker to jump to on success",
       },
       {
-        name: "giftState2",
+        name: "failureMarker",
         type: "string",
-        description: "Second state of the gift to check",
+        description: "Name of line marker to jump to on failure",
       },
     ],
     optional: [],
