@@ -44,7 +44,6 @@
     "@vscode/vsce": "^3.0.0"
   },
   "dependencies": {},
-  "author": "Daniel Bulman",
   "repository": {
     "type": "git",
     "url": "https://github.com/Danicus2000000/oyster-linter.git"
