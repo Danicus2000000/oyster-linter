@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as webpack from "webpack";
-import { CleanWebpackPlugin } from "clean-webpack-plugin";
+const path = require("path");
+const webpack = require("webpack");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
   target: "node",

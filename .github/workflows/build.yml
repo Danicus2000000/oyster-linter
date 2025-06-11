@@ -27,6 +27,18 @@ jobs:
       - name: Lint code
         run: npx tsc --noEmit
 
+      - name: Install webpack
+        run: npm install -D webpack-cli
+      
+      - name: Install Clean Webpack Plugin
+        run: npm install -D clean-webpack-plugin
+
+      - name: Install path
+        run: npm install -D path
+
+      - name: Install TS Loader
+        run: npm install -D ts-loader
+
       - name: Build with webpack
         run: npx webpack --config webpack.config.js
 
@@ -45,17 +57,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
+    permissions: 
+      contents: write
     steps:
       - name: Download VSIX artifact
         uses: actions/download-artifact@v4
         with:
           name: oyster-linter-vsix
-
-      - name: Get version from package.json
-        id: get_version
-        run: |
-          VERSION=$(jq -r .version < package.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         id: create_release
@@ -63,8 +71,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}-prerelease-${{ github.run_number }}
-          release_name: "Oyster Linter v${{ steps.get_version.outputs.version }} (Prerelease)"
+          tag_name: v0.${{ github.run_number }}-prerelease
+          release_name: "Oyster Linter v0.${{ github.run_number }}-prerelease (Prerelease)"
           prerelease: true
           draft: false
 
@@ -74,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./oyster-linter-*.vsix
-          asset_name: oyster-linter.vsix
+          asset_path: ${{ github.workspace }}/oyster-linter-vsix.vsix
+          asset_name: oyster-linter-vsix.vsix
           asset_content_type: application/zip
