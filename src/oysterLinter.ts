@@ -76,12 +76,12 @@ export const commands: CommandMap = {
     optional: [],
   },
   Set_Name: {
-    description: "Set the name of the character",
+    description: "Updates the name of the speaker to the supplied string",
     required: [
       {
         name: "name",
         type: "string",
-        description: "New name for the character",
+        description: "New speaker name",
       },
     ],
     optional: [],
