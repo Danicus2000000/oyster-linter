@@ -38,12 +38,15 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
-    "typescript": "^5.0.0",
     "@types/node": "^20.0.0",
-    "@vscode/vsce": "^3.0.0"
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.0.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "path": "^0.12.7",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.0.0",
+    "webpack-cli": "^6.0.1"
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/Danicus2000000/oyster-linter.git"

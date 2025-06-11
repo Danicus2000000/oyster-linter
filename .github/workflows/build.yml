@@ -5,6 +5,9 @@ on:
   pull_request:
     branches:
       - "**"
+  
+env:
+  version: 1.${{ github.run_number }}.${{ github.run_attempt}}
 
 jobs:
   build:
@@ -27,24 +30,12 @@ jobs:
       - name: Lint code
         run: npx tsc --noEmit
 
-      - name: Install webpack
-        run: npm install -D webpack-cli
-      
-      - name: Install Clean Webpack Plugin
-        run: npm install -D clean-webpack-plugin
-
-      - name: Install path
-        run: npm install -D path
-
-      - name: Install TS Loader
-        run: npm install -D ts-loader
-
       - name: Build with webpack
         run: npx webpack --config webpack.config.js
 
       - name: Package VS Code Extension
         if: github.event_name != 'pull_request'
-        run: npx vsce package
+        run: npx vsce package ${{ env.version }}
 
       - name: Upload VSIX artifact
         if: github.event_name != 'pull_request'
@@ -61,16 +52,18 @@ jobs:
       contents: write
     steps:
       - name: Download VSIX artifact
+        id: download-artifact
         uses: actions/download-artifact@v4
         with:
+          path: "/vsix"
           name: oyster-linter-vsix
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.${{ github.run_number }}
-          name: Oyster Linter v1.${{ github.run_number }}
-          files: oyster-linter-1.0.0.vsix
+          tag_name: v${{ env.version }}
+          name: Oyster Linter v.${{ env.version }}
+          files: ${{ steps.download-artifact.outputs.download-path }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
