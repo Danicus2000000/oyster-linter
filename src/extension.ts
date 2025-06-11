@@ -35,28 +35,37 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.languages.registerHoverProvider("oyster", {
     provideHover(document, position) {
       const line = document.lineAt(position.line).text;
+      // Find the command at the start of the line
       const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
       if (!match) return;
       const cmd = match[1];
-      const spec = (commands as any)[cmd];
-      if (!spec) return;
-      let md = "**" + cmd + "**";
+      // Make command lookup case-insensitive
+      const cmdKey = Object.keys(commands).find(
+        (k) => k.toLowerCase() === cmd.toLowerCase()
+      );
+      if (!cmdKey) return;
+      const spec = commands[cmdKey];
+      // Only show hover if hovering over the command name
+      const cmdStart = line.indexOf(cmd);
+      const cmdEnd = cmdStart + cmd.length;
+      if (position.character < cmdStart || position.character > cmdEnd) {
+        return;
+      }
+      let md = `**${cmdKey}**`;
+      md += `\n\n${spec.description}`;
       if (spec.required.length > 0) {
         md += "\n\n**Required parameters:**";
         for (const p of spec.required) {
-          md += "\n- `" + p.name + "` (" + p.type + ")";
+          md += `\n- \`${p.name}\` (${p.type}): ${p.description}`;
         }
       }
       if (spec.optional.length > 0) {
         md += "\n\n**Optional parameters:**";
         for (const p of spec.optional) {
-          md +=
-            "\n- `" +
-            p.name +
-            "` (" +
-            p.type +
-            (p.default !== undefined ? ", default: " + p.default : "") +
-            ")";
+          md += `\n- \`${p.name}\` (${p.type}${
+            p.default !== undefined ? ", default: " + p.default : ""
+          })`;
+          md += `: ${p.description}`;
         }
       }
       return new vscode.Hover(new vscode.MarkdownString(md));

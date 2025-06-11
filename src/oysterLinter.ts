@@ -5,9 +5,11 @@ export interface CommandParam {
   name: string;
   type: "string" | "int" | "bool";
   default?: boolean | number | string;
+  description: string;
 }
 
 export interface CommandSpec {
+  description: string;
   required: CommandParam[];
   optional: CommandParam[];
 }
@@ -17,64 +19,142 @@ export type CommandMap = Record<string, CommandSpec>;
 // Oyster 4S command spec
 export const commands: CommandMap = {
   Act_Append: {
-    required: [{ name: "text", type: "string" }],
+    description: "Append text to the current script",
+    required: [{ name: "text", type: "string", description: "Text to append" }],
     optional: [
-      { name: "instant", type: "bool", default: false },
-      { name: "wait", type: "bool", default: true },
+      {
+        name: "instant",
+        type: "bool",
+        default: false,
+        description: "If true, append instantly without delay",
+      },
+      {
+        name: "wait",
+        type: "bool",
+        default: true,
+        description:
+          "If true, wait for the append to complete before continuing",
+      },
     ],
   },
   Act_Speak: {
-    required: [{ name: "text", type: "string" }],
+    description: "Make the character speak",
+    required: [{ name: "text", type: "string", description: "Text to speak" }],
     optional: [
-      { name: "instant", type: "bool", default: false },
-      { name: "wait", type: "bool", default: true },
+      {
+        name: "instant",
+        type: "bool",
+        default: false,
+        description: "If true, speak instantly without delay",
+      },
+      {
+        name: "wait",
+        type: "bool",
+        default: true,
+        description:
+          "If true, wait for the speech to complete before continuing",
+      },
     ],
   },
   Jump_To: {
-    required: [{ name: "marker", type: "string" }],
+    description: "Jump to a specific label in the script",
+    required: [
+      { name: "marker", type: "string", description: "Label to jump to" },
+    ],
     optional: [],
   },
   Line_Marker: {
-    required: [{ name: "marker", type: "string" }],
+    description: "Define a marker in the script for jumping",
+    required: [{ name: "marker", type: "string", description: "Marker name" }],
     optional: [],
   },
   Set_Looker: {
-    required: [{ name: "looker", type: "string" }],
+    description: "Set the character that will look at something",
+    required: [
+      { name: "looker", type: "string", description: "Character to look" },
+    ],
     optional: [],
   },
   Set_Name: {
-    required: [{ name: "name", type: "string" }],
+    description: "Set the name of the character",
+    required: [
+      {
+        name: "name",
+        type: "string",
+        description: "New name for the character",
+      },
+    ],
     optional: [],
   },
   Set_Script: {
-    required: [{ name: "script", type: "string" }],
+    description: "Set the script to be executed",
+    required: [{ name: "script", type: "string", description: "Script name" }],
     optional: [],
   },
   Set_sprite: {
-    required: [{ name: "sprite", type: "string" }],
+    description: "Set the sprite for the character",
+    required: [{ name: "sprite", type: "string", description: "Sprite name" }],
     optional: [],
   },
   Sys_Wait: {
-    required: [{ name: "time", type: "int" }],
-    optional: [{ name: "canSkip", type: "bool" }],
+    description: "Wait for a specified time",
+    required: [
+      {
+        name: "time",
+        type: "int",
+        description: "Time to wait in milliseconds",
+      },
+    ],
+    optional: [
+      {
+        name: "canSkip",
+        type: "bool",
+        description: "If true, user can skip the wait",
+      },
+    ],
   },
   Deliver_Gift: {
+    description: "Deliver a gift from one person to another",
     required: [
-      { name: "to", type: "string" },
-      { name: "from", type: "string" },
+      { name: "to", type: "string", description: "Person to deliver to" },
+      {
+        name: "from",
+        type: "string",
+        description: "Person delivering the gift",
+      },
     ],
     optional: [],
   },
   Give_Item: {
-    required: [{ name: "itemName", type: "string" }],
+    description: "Give an item to a person",
+    required: [
+      { name: "itemName", type: "string", description: "Name of the item" },
+    ],
     optional: [],
   },
   Check_Has: {
+    description: "Check if a person has a specific item",
     required: [
-      { name: "personInventory", type: "string" },
-      { name: "itemName", type: "string" },
-      { name: "giftState", type: "string" },
-      { name: "giftState2", type: "string" },
+      {
+        name: "personInventory",
+        type: "string",
+        description: "Person's inventory to check",
+      },
+      {
+        name: "itemName",
+        type: "string",
+        description: "Name of the item to check",
+      },
+      {
+        name: "giftState",
+        type: "string",
+        description: "State of the gift to check",
+      },
+      {
+        name: "giftState2",
+        type: "string",
+        description: "Second state of the gift to check",
+      },
     ],
     optional: [],
   },
