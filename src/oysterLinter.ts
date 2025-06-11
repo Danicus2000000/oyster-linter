@@ -71,7 +71,7 @@ export const commands: CommandMap = {
   Set_Looker: {
     description: "Updates the object which the player's camera is steered towards, given the object does not exist, does nothing",
     required: [
-      { name: "looker", type: "string", description: "The name of the object to look at" },
+      { name: "looker", type: "string", description: "The name of the object to look at. Supplying 'default' causes the camera to return to the conversation's original looker" },
     ],
     optional: [],
   },
