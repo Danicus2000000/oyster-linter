@@ -1,0 +1,21 @@
+{
+  "scopeName": "source.oyster",
+  "name": "Oyster 4S",
+  "patterns": [
+    {
+      "name": "entity.name.function.oyster",
+      "match": "^([A-Za-z_][A-Za-z0-9_]*)\\s*\\["
+    },
+    {
+      "name": "comment.line.number-sign.oyster",
+      "match": "^(#.*)$"
+    },
+    {
+      "name": "string.quoted.double.oyster",
+      "match": "\\\"([^\\\"\\r\\n]|\\\\.)*\\\""
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["txt"],
+  "uuid": "b1e1e1e1-1111-1111-1111-111111111111"
+}

@@ -23,6 +23,13 @@
         ],
         "configuration": "./language-configuration.json"
       }
+    ],
+    "grammars": [
+      {
+        "language": "oyster",
+        "scopeName": "source.oyster",
+        "path": "./syntaxes/oyster.tmLanguage.json"
+      }
     ]
   },
   "scripts": {
