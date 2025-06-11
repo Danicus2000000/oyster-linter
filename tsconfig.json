@@ -6,7 +6,7 @@
     "lib": ["es2020"],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": false,
+    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },

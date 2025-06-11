@@ -1,7 +1,21 @@
 import * as vscode from "vscode";
 
+// Types for Oyster command spec
+export interface CommandParam {
+  name: string;
+  type: "string" | "int" | "bool";
+  default?: boolean | number | string;
+}
+
+export interface CommandSpec {
+  required: CommandParam[];
+  optional: CommandParam[];
+}
+
+export type CommandMap = Record<string, CommandSpec>;
+
 // Oyster 4S command spec
-const commands = {
+export const commands: CommandMap = {
   Act_Append: {
     required: [{ name: "Parameter1", type: "string" }],
     optional: [
@@ -46,7 +60,7 @@ const commands = {
   },
 };
 
-function parseValue(str: string, type: string): boolean {
+function parseValue(str: string, type: CommandParam["type"]): boolean {
   if (type === "string") return /^".*"$/.test(str.trim());
   if (type === "int") return /^-?\d+$/.test(str.trim());
   if (type === "bool") return /^(true|false)$/i.test(str.trim());
@@ -72,9 +86,9 @@ export function lintOysterDocument(
       );
       continue;
     }
-    const cmd = match[1];
-    const paramStr = match[2];
-    const spec = commands[cmd];
+    const cmd: string = match[1];
+    const paramStr: string = match[2];
+    const spec: CommandSpec | undefined = commands[cmd];
     if (!spec) {
       diagnostics.push(
         new vscode.Diagnostic(
@@ -86,7 +100,7 @@ export function lintOysterDocument(
       continue;
     }
     // Split params: required first, then optional as key=value
-    const params = paramStr
+    const params: string[] = paramStr
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
@@ -114,8 +128,8 @@ export function lintOysterDocument(
     }
     // Check optional
     for (let j = spec.required.length; j < params.length; j++) {
-      const opt = params[j];
-      const eqIdx = opt.indexOf("=");
+      const opt: string = params[j];
+      const eqIdx: number = opt.indexOf("=");
       if (eqIdx === -1) {
         diagnostics.push(
           new vscode.Diagnostic(
@@ -126,9 +140,9 @@ export function lintOysterDocument(
         );
         continue;
       }
-      const key = opt.substring(0, eqIdx).trim();
-      const val = opt.substring(eqIdx + 1).trim();
-      const optSpec = spec.optional.find((o) => o.name === key);
+      const key: string = opt.substring(0, eqIdx).trim();
+      const val: string = opt.substring(eqIdx + 1).trim();
+      const optSpec: CommandParam | undefined = spec.optional.find((o) => o.name === key);
       if (!optSpec) {
         diagnostics.push(
           new vscode.Diagnostic(
