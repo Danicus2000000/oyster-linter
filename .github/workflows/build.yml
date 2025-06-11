@@ -68,11 +68,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.${{ github.run_number }}.${{github.run_attempt}}-prerelease
-          name: Oyster Linter v0.${{ github.run_number }}.${{github.run_attempt}}-prerelease (Prerelease)
+          tag_name: v1.${{ github.run_number }}
+          name: Oyster Linter v1.${{ github.run_number }}
           files: oyster-linter-1.0.0.vsix
           draft: false
-          prerelease: true
+          prerelease: false
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: "true"
