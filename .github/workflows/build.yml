@@ -40,3 +40,40 @@ jobs:
         with:
           name: oyster-linter-vsix
           path: "*.vsix"
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: oyster-linter-vsix
+
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version < package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}-prerelease-${{ github.run_number }}
+          release_name: "Oyster Linter v${{ steps.get_version.outputs.version }} (Prerelease)"
+          prerelease: true
+          draft: false
+
+      - name: Upload VSIX to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./oyster-linter-*.vsix
+          asset_name: oyster-linter.vsix
+          asset_content_type: application/zip
