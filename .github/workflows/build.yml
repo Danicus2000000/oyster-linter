@@ -64,25 +64,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: oyster-linter-vsix
-          path: ./
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v0.${{ github.run_number }}.${{github.run_attempt}}-prerelease
-          release_name: "Oyster Linter v0.${{ github.run_number }}.${{github.run_attempt}}-prerelease (Prerelease)"
-          prerelease: true
+          name: Oyster Linter v0.${{ github.run_number }}.${{github.run_attempt}}-prerelease (Prerelease)
+          files: oyster-linter-1.0.0.vsix
           draft: false
-
-      - name: Upload VSIX to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/oyster-linter-vsix
-          asset_name: oyster-linter-vsix.zip
-          asset_content_type: application/zip
+          prerelease: true
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: "true"

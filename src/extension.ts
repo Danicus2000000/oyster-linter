@@ -71,6 +71,38 @@ export function activate(context: vscode.ExtensionContext) {
       return new vscode.Hover(new vscode.MarkdownString(md));
     },
   });
+
+  /**
+   * Provides command name completions for Oyster 4S commands in Oyster files.
+   * Suggests command names from the commands object at the start of a line or after whitespace.
+   * Suggestions appear on Ctrl+Space or after typing a letter/underscore at the start of a line or after whitespace.
+   */
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      "oyster",
+      {
+        provideCompletionItems(document, position) {
+          const line = document.lineAt(position.line).text;
+          const prefix = line.slice(0, position.character);
+          // Only suggest at start of line or after whitespace
+          if (!/^\s*$/.test(prefix) && !/\s$/.test(prefix)) {
+            return undefined;
+          }
+          return Object.keys(commands).map((cmd) => {
+            const item = new vscode.CompletionItem(
+              cmd,
+              vscode.CompletionItemKind.Function
+            );
+            item.detail = commands[cmd].description;
+            item.insertText = cmd;
+            item.commitCharacters = ["["];
+            return item;
+          });
+        },
+      }
+      // No trigger characters: suggestions appear on Ctrl+Space
+    )
+  );
 }
 
 function lintAndReport(
