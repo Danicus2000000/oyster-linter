@@ -87,7 +87,7 @@ export const commands: CommandMap = {
     optional: [],
   },
   Set_Script: {
-    description: "Set the script to be executed",
+    description: "Set the name of the script that the character being interacted with points to. Effect can be seen when next interacting with them",
     required: [{ name: "script", type: "string", description: "Script name" }],
     optional: [],
   },
