@@ -69,9 +69,9 @@ export const commands: CommandMap = {
     optional: [],
   },
   Set_Looker: {
-    description: "Set the character that will look at something",
+    description: "Updates the object which the player's camera is steered towards, given the object does not exist, does nothing",
     required: [
-      { name: "looker", type: "string", description: "Character to look" },
+      { name: "looker", type: "string", description: "The name of the object to look at" },
     ],
     optional: [],
   },
