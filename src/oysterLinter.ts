@@ -114,13 +114,13 @@ export const commands: CommandMap = {
     ],
   },
   Deliver_Gift: {
-    description: "Deliver a gift from one person to another",
+    description: "Deliver a named gift to someone",
     required: [
       { name: "to", type: "string", description: "Person to deliver to" },
       {
-        name: "from",
+        name: "giftName",
         type: "string",
-        description: "Person delivering the gift",
+        description: "The name of the gift to deliver. E.G. The first gift from Alyx could be written as 'Alyx_0'",
       },
     ],
     optional: [],
