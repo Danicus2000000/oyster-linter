@@ -57,14 +57,14 @@ export const commands: CommandMap = {
     ],
   },
   Jump_To: {
-    description: "Jump to a specific label in the script",
+    description: "Unconditionally jump to a specific line marker in the current script",
     required: [
-      { name: "marker", type: "string", description: "Label to jump to" },
+      { name: "marker", type: "string", description: "Line marker to jump to" },
     ],
     optional: [],
   },
   Line_Marker: {
-    description: "Define a marker in the script for jumping",
+    description: "Define a line marker in the script",
     required: [{ name: "marker", type: "string", description: "Marker name" }],
     optional: [],
   },
