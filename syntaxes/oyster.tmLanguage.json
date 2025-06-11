@@ -12,7 +12,22 @@
     },
     {
       "name": "string.quoted.double.oyster",
-      "match": "\\\"([^\\\"\\r\\n]|\\\\.)*\\\""
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.oyster",
+          "match": "\\."
+        }
+      ]
+    },
+    {
+      "name": "constant.numeric.integer.oyster",
+      "match": "-?\\b\\d+\\b"
+    },
+    {
+      "name": "constant.language.boolean.oyster",
+      "match": "\\b(True|False)\\b"
     }
   ],
   "repository": {},
