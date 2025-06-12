@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -54,7 +55,7 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: "true"
-      
+          
       - name: Publish VSIX
         if: github.event_name == 'workflow_dispatch'
-        run: npx vsce publish || ${{ secrets.MARKETPLACE_PAT}}
+        run: npx vsce publish -p ${{ secrets.MARKETPLACE_PAT }}
