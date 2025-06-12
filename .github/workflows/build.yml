@@ -33,17 +33,17 @@ jobs:
         run: npx webpack --config webpack.config.js
 
       - name: Package VS Code Extension
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         run: npx vsce package
 
       - name: Get version from package.json
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         id: version
         run: |
           echo "version=$(cat package.json | jq -r '.version')" >> "$GITHUB_OUTPUT"
 
       - name: Create Release
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version  }}
@@ -54,3 +54,7 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: "true"
+      
+      - name: Publish VSIX
+        if: github.event_name == 'workflow_dispatch'
+        run: npx vsce publish ${{ secrets.PUBLISHER_ID }} || ${{ secrets.MARKETPLACE_PAT}}

@@ -2,7 +2,7 @@
   "name": "oyster-linter",
   "displayName": "Oyster Linter",
   "description": "Lints Oyster 4S scripts for syntax and command errors.",
-  "version": "1.43.3",
+  "version": "1.43.4",
   "engines": {
     "vscode": ">=1.80.0"
   },
