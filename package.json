@@ -3,7 +3,7 @@
   "displayName": "Oyster Linter",
   "description": "Lints Oyster 4S scripts for syntax and command errors.",
   "publisher": "AnActualPan",
-  "version": "1.43.7",
+  "version": "1.44.0",
   "engines": {
     "vscode": "^1.101.0"
   },
