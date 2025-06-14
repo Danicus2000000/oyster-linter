@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
-import { lintOysterDocument, commands } from "./oysterLinter";
+import { lintOysterDocument } from "./oysterLinter";
+import { commands } from "./commands";
 
+/**
+ * Activates the Oyster extension.
+ * @param context The extension context.
+ */
 export function activate(context: vscode.ExtensionContext) {
   const diagnosticCollection =
     vscode.languages.createDiagnosticCollection("oyster");
@@ -53,12 +58,15 @@ export function activate(context: vscode.ExtensionContext) {
       }
       let md = `**${cmdKey}**`;
       md += `\n\n${spec.description}`;
+      md += `\n\nIntroduced in: Oyster **${spec.introducedVersion}**`;
+
       if (spec.required.length > 0) {
         md += "\n\n**Required parameters:**";
         for (const p of spec.required) {
           md += `\n- \`${p.name}\` (${p.type}): ${p.description}`;
         }
       }
+
       if (spec.optional.length > 0) {
         md += "\n\n**Optional parameters:**";
         for (const p of spec.optional) {
@@ -68,6 +76,14 @@ export function activate(context: vscode.ExtensionContext) {
           md += `: ${p.description}`;
         }
       }
+
+      if (spec.compatibleGames.length > 0) {
+        md += `\n\n**Compatible games:**`;
+        for (const game of spec.compatibleGames) {
+          md += `\n- ${game}`;
+        }
+      }
+
       return new vscode.Hover(new vscode.MarkdownString(md));
     },
   });
@@ -105,6 +121,11 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
+/**
+ * Lints an Oyster document and reports diagnostics.
+ * @param doc The Oyster document to lint.
+ * @param collection The diagnostic collection to report to.
+ */
 function lintAndReport(
   doc: vscode.TextDocument,
   collection: vscode.DiagnosticCollection
@@ -113,4 +134,7 @@ function lintAndReport(
   collection.set(doc.uri, diagnostics);
 }
 
+/**
+ * Deactivates the Oyster extension.
+ */
 export function deactivate() {}
