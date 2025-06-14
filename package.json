@@ -39,7 +39,7 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.0.1",
     "@types/vscode": "^1.80.0",
     "@vscode/vsce": "^3.0.0",
     "clean-webpack-plugin": "^4.0.0",
