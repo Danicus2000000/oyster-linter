@@ -120,6 +120,33 @@ True
 False
 ```
 
+## Writing a Line
+
+A line in Oyster can be one of three things:
+
+- A command,
+- A blank line,
+- A comment.
+
+### A Command
+
+These are written as shown in the 'How to supply parameters' section of the document.
+
+### A blank line
+
+It's as simple as it sounds, just leave a blank line and Oyster will ignore it when parsing the script.
+
+### A comment
+
+Comments start with '//' and may only span one line.
+Comments cannot occur on the same line as a command.
+An example would be:
+```OScript
+// I'm a valid comment
+
+act_speak ["Pineapple"] // I'm going to cause problems!
+```
+
 ## Command Explanations
 
 ### Act_Append (base)
