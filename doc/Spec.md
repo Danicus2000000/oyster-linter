@@ -147,8 +147,6 @@ An example would be:
 act_speak ["Pineapple"] // I'm going to cause problems!
 ```
 
-## Command Explanations
-
 ### Act_Append (base)
 
 #### Parameters
@@ -300,3 +298,75 @@ Changes the current sprite to the one described by the above parameter, if the s
 #### Functionality
 
 Waits for the given amount of time, or skips on player input, if that parameter is set
+
+### Drop_Item (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Give_Item (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Check_Has (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Check_Win (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Deliver_Gift (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Set_Achievement (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Start_Credits (Christmas at Greyling Grove)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Set_FOV (Speed Dating for the Socially Inept)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Set_Colour (Speed Dating for the Socially Inept)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Show_Options (Speed Dating for the Socially Inept)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Inc_Affection (Speed Dating for the Socially Inept)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
+
+### Call_Puppet (Speed Dating for the Socially Inept)
+#### Parameters
+##### Required:
+##### Optional:
+#### Functionality
