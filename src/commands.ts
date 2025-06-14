@@ -156,7 +156,7 @@ export const commands: CommandMap = {
     description:
       "Attempt to give the player an item, given the player cannot accept the item (e.g. full inventory), the game running Oyster should ensure that the item can be retrieved later in some way (e.g. GroveGame drops the item at the player's origin)",
     introducedVersion: "4.0.0s",
-    compatibleGames: ["Base"],
+    compatibleGames: ["Christmas at Greyling Grove"],
     required: [
       { name: "itemName", type: "string", description: "Name of the item" },
     ],
@@ -166,7 +166,7 @@ export const commands: CommandMap = {
     description:
       "Checks Whether a given character has received a specific item, and jumps to line markers accordingly",
     introducedVersion: "4.0.0s",
-    compatibleGames: ["Base"],
+    compatibleGames: ["Christmas at Greyling Grove"],
     required: [
       {
         name: "person",
