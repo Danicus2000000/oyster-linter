@@ -14,7 +14,7 @@
 - Set_sprite,
 - Sys_Wait.
 
-# Christmas at Greyling Grove
+### Christmas at Greyling Grove
 
 - Drop_Item,
 - Give_Item,
@@ -24,7 +24,7 @@
 - Set_Achievement,
 - Start_Credits.
 
-# Speed Dating for the Socially Inept
+### Speed Dating for the Socially Inept
 
 - Set_FOV,
 - Set_Colour,
@@ -342,31 +342,148 @@ Waits for the given amount of time, or skips on player input, if that parameter 
 #### Functionality
 
 ### Set_FOV (Speed Dating for the Socially Inept)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: An integer value representing the target field of view in degrees.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Updates Oyster's 'Target FOV' value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.
 
 ### Set_Colour (Speed Dating for the Socially Inept)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: The R value of the target colour.
+
+**Parameter2**: The G value of the target colour.
+
+**Parameter3**: The B value of the target colour.
+
+**Parameter4**: The A value of the target colour.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Sets the colour of the character's name to the parameters specified in one frame.
+
+If all parameters are passed as '-1', then Oyster resets the text colour to its original value from the start of the conversation.
 
 ### Show_Options (Speed Dating for the Socially Inept)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: The display text for the first option.
+
+**Parameter2**: The display text for the second option (for choices with only one option, do not supply this parameter).
+
+**Parameter3** The display text for the third option (for choices with two or fewer options, do not supply this parameter).
+
 ##### Optional:
+
+**lm1**: The name of the line marker to jump to when option one is selected. Technically required due to this, but is written like an optional.
+
+**lm2**: The name of the line marker to jump to when option two is selected. Required for choices with two or more options.
+
+**lm3**: The name of the line marker to jump to when option three is selected. Required for choices with three or more options.
+
 #### Functionality
+
+This command is a weird one. The definition of required and optional parameter get a bit grey here, so pay close attention to the description of the parameters to know how to write it.
+
+When called, this command will cause a set of options to appear, and will pause script execution until the player selects an option.
 
 ### Inc_Affection (Speed Dating for the Socially Inept)
+
 #### Parameters
+
 ##### Required:
+
+*No required parameters*
+
 ##### Optional:
+
+**half**: A boolean value, when set to true, the character's affection is increased by only half a point. Defaults to false.
+
 #### Functionality
 
+Increases the affection of the character currently in conversation by one point, or by half a point if the optional parameter is provided.
+
 ### Call_Puppet (Speed Dating for the Socially Inept)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the command name.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+This entire command is one huge hack to speed up game development. Do not use it.
+
+Internally, the 'puppet' is listening to Oyster and waiting for this command, each scene has its own specialised puppet that responds to specific things.
+
+Effectively, this command allows for oddly specific pieces of functionality to be controlled through Oyster, without designing a new command. Making games in a week is tough.
+
+Here is a list of valid 'Parameter1's:
+
+##### Presenter's Scene
+
+###### Contestant Display
+
+- ShowContestantsDisplay,
+- HideContestantsDisplay.
+
+Enables or disables the contestant display.
+
+- ShowContestantsPre,
+- ShowNarin,
+- ShowKarin,
+- ShowEvelyn,
+- ShowCeri,
+- ShowNika,
+- ShowMila.
+
+Sets the image on the contestants display, all of them should be self explanatory, other than 'ShowContestantsPre' which simply shows a cover image, intended to be used to show a blank-ish screen before contestants get introduced.
+
+###### Multi-Speaker Implementation
+
+- SetSpeaker_All,
+- SetSpeaker_Arthur,
+- SetSpeaker_Dusk,
+- SetSpeaker_Dawn,
+- SetSpriter_Arthur,
+- SetSpriter_Dusk,
+- SetSpriter_Dawn.
+
+The presenter scene does some hackery to get three characters all talking in one conversation. The main way it does this is by implementing its own set of scripts for what would usually make up a character, which contains its own code to manage each character separately, one at a time. Using any of these tells the respective script to swap to the stated character.
+
+##### Main Date Room
+
+- DateEnd,
+- FadeOut,
+- FadeIn.
+
+These should all be self explanatory:
+
+- DateEnd moves the game to the next day,
+- FadeOut causes the screen to fade out,
+- FadeIn causes the screen to fade in.
