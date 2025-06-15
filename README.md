@@ -5,6 +5,7 @@ The Oyster Linter is a Visual Studio Code extension designed to aid in the creat
 ## Features
 
 - **Linting and Validation**: Automatically checks Oyster 4s commands for syntax errors, and can provide suggestions to fix errors.
+**Command Suggestions**: Press `ctrl+space` on a blank line to get a full list of supported commands.
 - **Parameter Context**: Hover over a command to bee given an explanation of what the command does, plus what its parameters are and what they do.
 - **Language Mode**: Ensure the language mode is set to `Oyster 4s`. If it is not, click the language indicator in the bottom-right corner of VS Code (e.g., "Plain Text") and search for `Oyster 4s` in the available languages.
 
