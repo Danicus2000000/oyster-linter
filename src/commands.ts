@@ -154,7 +154,7 @@ export const commands: CommandMap = {
   },
   Give_Item: {
     description:
-      "Attempt to give the player an item, given the player cannot accept the item (e.g. full inventory), the game running Oyster should ensure that the item can be retrieved later in some way (e.g. GroveGame drops the item at the player's origin)",
+      "Attempt to give the player an item, given the player cannot accept the item (e.g. full inventory), the player's current item will be dropped into the world to make space for the new one.",
     introducedVersion: "4.0.0s",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [

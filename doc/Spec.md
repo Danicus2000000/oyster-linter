@@ -300,46 +300,130 @@ Changes the current sprite to the one described by the above parameter, if the s
 Waits for the given amount of time, or skips on player input, if that parameter is set
 
 ### Drop_Item (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+*No required parameters*
+
 ##### Optional:
+
+**onplayer**: A boolean value that when set to true, causes the dropped item to appear at or near the player. Defaults to false.
+
 #### Functionality
+
+Causes the player to drop their currently held item. If 'onplayer' is not set to true, then the item spawns out of bounds.
+
+In games with a concept similar to Greyling Grove's 'Lost N Found', this command cannot act as a 'delete item' command, as the 'Lost N Found' would still bring the item back into bounds when used.
 
 ### Give_Item (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the name of the item to give.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Attempts to give the player the named item, given that the player cannot accept the item due to a full inventory, the player will be forced to drop their current item into the world to make room for the new item.
 
 ### Check_Has (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the name of the character to check.
+
+**Parameter2**: A string representing the name of the item to check for.
+
+**Parameter3**: A string representing a line marker to jump to if the character has the item.
+
+**Parameter4**: A string representing a line marker to jump to if the character does not have the item.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Checks whether the given character 'has' the given item, as in whether the player has delivered this item to them. Jumps to the respective line markers for whether the check passes or fails.
 
 ### Check_Win (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the name of the line marker to jump to if the check passes.
+
+**Parameter2**: A string representing the name of the line marker to jump to if the check fails.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+A very hardcoded command that simply checks if a certain number of presents have been delivered. Given that a certain number of presents have been delivered, the script is jumped to the line marker named by 'Parameter1'. Otherwise, jumps to the line marker described by 'Parameter2'.
 
 ### Deliver_Gift (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the name of the person receiving the gift.
+
+**Parameter2**: A string representing the name of the gift being delivered.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Marks the named gift as being delivered to the named person. This marking is what is checked by 'Check_Has' and 'Check_Win'.
 
 ### Set_Achievement (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+**Parameter1**: A string representing the name of the achievement to unlock.
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
 
+Unlocks the achievement, given it exists. Achievements with multiple unlock conditions are not supported (kind of).
+
+In Greyling Grove, the achievement implementation allows for achievements to have 'requirements', which themselves are like hidden achievements, which can be used to create achievements that require multiple conditions or for something to happen multiple times.
+
 ### Start_Credits (Christmas at Greyling Grove)
+
 #### Parameters
+
 ##### Required:
+
+*No required parameters*
+
 ##### Optional:
+
+*No optional parameters*
+
 #### Functionality
+
+Instantly moves the game to the credits scene. Implemented as a hack to let Johny trigger the ending credits in Greyling Grove.
 
 ### Set_FOV (Speed Dating for the Socially Inept)
 
@@ -363,13 +447,13 @@ Updates Oyster's 'Target FOV' value, given the new value is different, Oyster wi
 
 ##### Required:
 
-**Parameter1**: The R value of the target colour.
+**Parameter1**: An integer representing the R value of the target colour.
 
-**Parameter2**: The G value of the target colour.
+**Parameter2**: An integer representing the G value of the target colour.
 
-**Parameter3**: The B value of the target colour.
+**Parameter3**: An integer representing the B value of the target colour.
 
-**Parameter4**: The A value of the target colour.
+**Parameter4**: An integer representing the A value of the target colour.
 
 ##### Optional:
 
@@ -387,19 +471,19 @@ If all parameters are passed as '-1', then Oyster resets the text colour to its 
 
 ##### Required:
 
-**Parameter1**: The display text for the first option.
+**Parameter1**: A string representing the display text for the first option.
 
-**Parameter2**: The display text for the second option (for choices with only one option, do not supply this parameter).
+**Parameter2**: A string representing the display text for the second option (for choices with only one option, do not supply this parameter).
 
-**Parameter3** The display text for the third option (for choices with two or fewer options, do not supply this parameter).
+**Parameter3** A string representing the display text for the third option (for choices with two or fewer options, do not supply this parameter).
 
 ##### Optional:
 
-**lm1**: The name of the line marker to jump to when option one is selected. Technically required due to this, but is written like an optional.
+**lm1**: A string representing the name of the line marker to jump to when option one is selected. Technically required due to this, but is written like an optional.
 
-**lm2**: The name of the line marker to jump to when option two is selected. Required for choices with two or more options.
+**lm2**: A string representing the name of the line marker to jump to when option two is selected. Required for choices with two or more options.
 
-**lm3**: The name of the line marker to jump to when option three is selected. Required for choices with three or more options.
+**lm3**: A string representing the name of the line marker to jump to when option three is selected. Required for choices with three or more options.
 
 #### Functionality
 
