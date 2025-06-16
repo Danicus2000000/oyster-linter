@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
       let md = `**${cmdKey}**`;
       md += `\n\n${spec.description}`;
       md += `\n\nIntroduced in: Oyster **${spec.introducedVersion}**`;
-
+      md += '\n\nFor more information on this command [check the documentation](https://github.com/Danicus2000000/oyster-linter/tree/main/doc/commands/' + cmdKey +'.md).';
       if (spec.required.length > 0) {
         md += "\n\n**Required parameters:**";
         for (const p of spec.required) {
