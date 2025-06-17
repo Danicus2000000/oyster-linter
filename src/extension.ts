@@ -197,33 +197,6 @@ export function activate(context: vscode.ExtensionContext) {
       },
       '[', ' ', ',',
     ),
-    // CodeActionProvider: Suggest quick fixes for unknown commands/params
-    vscode.languages.registerCodeActionsProvider("oyster", {
-      provideCodeActions(document, range, context) {
-        const actions = [];
-        for (const diag of context.diagnostics) {
-          if (diag.message.startsWith("Unknown Oyster command")) {
-            actions.push({
-              title: "See available commands",
-              command: "editor.action.showHover",
-              arguments: [document.uri, diag.range.start]
-            });
-          }
-          if (diag.message.startsWith("Missing required parameter")) {
-            actions.push({
-              title: "Add missing parameter",
-              command: "editor.action.insertSnippet",
-              arguments: [
-                { snippet: ' "value"' },
-                document.uri,
-                diag.range.end
-              ]
-            });
-          }
-        }
-        return actions;
-      }
-    }),
     // Formatting providers: Format Oyster commands (align brackets, spacing)
     vscode.languages.registerDocumentFormattingEditProvider("oyster", {
       provideDocumentFormattingEdits(document) {
