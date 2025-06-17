@@ -115,41 +115,6 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    // DefinitionProvider: Go to definition for line markers
-    vscode.languages.registerDefinitionProvider("oyster", {
-      provideDefinition(document, position) {
-        const line = document.lineAt(position.line).text;
-        const markerMatch = line.match(/Jump_To\s*\[\s*"([^"]+)"/);
-        if (markerMatch) {
-          const marker = markerMatch[1];
-          for (let i = 0; i < document.lineCount; i++) {
-            const l = document.lineAt(i).text;
-            const defMatch = l.match(/Line_Marker\s*\[\s*"([^"]+)"/);
-            if (defMatch && defMatch[1] === marker) {
-              return new vscode.Location(document.uri, new vscode.Position(i, 0));
-            }
-          }
-        }
-        return undefined;
-      }
-    }),
-    // ReferenceProvider: Find all usages of a line marker
-    vscode.languages.registerReferenceProvider("oyster", {
-      provideReferences(document, position, context, token) {
-        const line = document.lineAt(position.line).text;
-        const markerMatch = line.match(/Line_Marker\s*\[\s*"([^"]+)"/);
-        if (!markerMatch) return [];
-        const marker = markerMatch[1];
-        const refs = [];
-        for (let i = 0; i < document.lineCount; i++) {
-          const l = document.lineAt(i).text;
-          if (l.includes(`"${marker}"`)) {
-            refs.push(new vscode.Location(document.uri, new vscode.Position(i, 0)));
-          }
-        }
-        return refs;
-      }
-    }),
     // DocumentSymbolProvider: List all commands and line markers
     vscode.languages.registerDocumentSymbolProvider("oyster", {
       provideDocumentSymbols(document) {
@@ -207,29 +172,6 @@ export function activate(context: vscode.ExtensionContext) {
       },
       '[', ' ', ',',
     ),
-    // RenameProvider: Rename line markers
-    vscode.languages.registerRenameProvider("oyster", {
-      provideRenameEdits(document, position, newName) {
-        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
-        if (!wordRange) return null;
-        const oldName = document.getText(wordRange).replace(/"/g, "");
-        const edit = new vscode.WorkspaceEdit();
-        for (let i = 0; i < document.lineCount; i++) {
-          const l = document.lineAt(i).text;
-          let idx = l.indexOf(`"${oldName}"`);
-          while (idx !== -1) {
-            edit.replace(document.uri, new vscode.Range(i, idx + 1, i, idx + 1 + oldName.length), newName);
-            idx = l.indexOf(`"${oldName}"`, idx + 1);
-          }
-        }
-        return edit;
-      },
-      prepareRename(document, position) {
-        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
-        if (!wordRange) throw new Error("Not on a marker");
-        return wordRange;
-      }
-    }),
     // CodeActionProvider: Suggest quick fixes for unknown commands/params
     vscode.languages.registerCodeActionsProvider("oyster", {
       provideCodeActions(document, range, context) {
@@ -318,26 +260,6 @@ export function activate(context: vscode.ExtensionContext) {
       },
       '\n', ';'
     ),
-    // FoldingRangeProvider: Fold between Line_Marker commands
-    vscode.languages.registerFoldingRangeProvider("oyster", {
-      provideFoldingRanges(document) {
-        const ranges = [];
-        let start = null;
-        for (let i = 0; i < document.lineCount; i++) {
-          const line = document.lineAt(i).text;
-          if (line.startsWith("Line_Marker")) {
-            if (start !== null) {
-              ranges.push(new vscode.FoldingRange(start, i - 1));
-            }
-            start = i;
-          }
-        }
-        if (start !== null && start < document.lineCount - 1) {
-          ranges.push(new vscode.FoldingRange(start, document.lineCount - 1));
-        }
-        return ranges;
-      }
-    }),
     // SelectionRangeProvider: Expand selection to command/parameter block
     vscode.languages.registerSelectionRangeProvider("oyster", {
       provideSelectionRanges(document, positions) {
@@ -379,75 +301,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         return values;
       }
-    }),
-    // LinkedEditingRangeProvider: Edit all instances of a marker at once
-    vscode.languages.registerLinkedEditingRangeProvider("oyster", {
-      provideLinkedEditingRanges(document, position) {
-        const wordRange = document.getWordRangeAtPosition(position, /"[^\"]+"/);
-        if (!wordRange) return null;
-        const marker = document.getText(wordRange).replace(/"/g, "");
-        const ranges = [];
-        for (let i = 0; i < document.lineCount; i++) {
-          const l = document.lineAt(i).text;
-          let idx = l.indexOf(`"${marker}"`);
-          while (idx !== -1) {
-            ranges.push(new vscode.Range(i, idx + 1, i, idx + 1 + marker.length));
-            idx = l.indexOf(`"${marker}"`, idx + 1);
-          }
-        }
-        return { ranges, wordPattern: /\w+/ };
-      }
-    }),
-    // CallHierarchyProvider: Show which commands jump to which markers
-    vscode.languages.registerCallHierarchyProvider("oyster", {
-      prepareCallHierarchy(document, position) {
-        const line = document.lineAt(position.line).text;
-        const jumpMatch = line.match(/Jump_To\s*\[\s*"([^\"]+)"/);
-        if (jumpMatch) {
-          const marker = jumpMatch[1];
-          return [{
-            name: `Jump_To ${marker}`,
-            kind: vscode.SymbolKind.Function,
-            uri: document.uri,
-            range: new vscode.Range(position.line, 0, position.line, line.length),
-            selectionRange: new vscode.Range(position.line, 0, position.line, line.length)
-          }];
-        }
-        return [];
-      },
-      provideCallHierarchyIncomingCalls(item, token) {
-        // Not implemented for simplicity
-        return [];
-      },
-      provideCallHierarchyOutgoingCalls(item, token) {
-        // Not implemented for simplicity
-        return [];
-      }
-    }),
-    // TypeHierarchyProvider: Show command groups (all commands are same group)
-    vscode.languages.registerTypeHierarchyProvider("oyster", {
-      prepareTypeHierarchy(document, position) {
-        const line = document.lineAt(position.line).text;
-        const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
-        if (cmdMatch) {
-          return [{
-            name: cmdMatch[1],
-            kind: vscode.SymbolKind.Function,
-            uri: document.uri,
-            range: new vscode.Range(position.line, 0, position.line, line.length),
-            selectionRange: new vscode.Range(position.line, 0, position.line, line.length)
-          }];
-        }
-        return [];
-      },
-      provideTypeHierarchySupertypes(item, token) {
-        return [];
-      },
-      provideTypeHierarchySubtypes(item, token) {
-        return [];
-      }
-    })
-  );
+    }));
 }
 
 /**
