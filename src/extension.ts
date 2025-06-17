@@ -95,15 +95,10 @@ export function activate(context: vscode.ExtensionContext) {
    */
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
-      "oyster",
+      {language : "oyster", scheme: "file" },
       {
-        provideCompletionItems(document, position) {
-          const line = document.lineAt(position.line).text;
-          const prefix = line.slice(0, position.character);
-          // Only suggest at start of line or after whitespace
-          if (!/^\s*$/.test(prefix) && !/\s$/.test(prefix)) {
-            return undefined;
-          }
+        provideCompletionItems() {
+          // Always provide completions when a trigger character is typed
           return Object.keys(commands).map((cmd) => {
             const item = new vscode.CompletionItem(
               cmd,
@@ -116,8 +111,342 @@ export function activate(context: vscode.ExtensionContext) {
           });
         },
       }
-      // No trigger characters: suggestions appear on Ctrl+Space
     )
+  );
+
+  context.subscriptions.push(
+    // DefinitionProvider: Go to definition for line markers
+    vscode.languages.registerDefinitionProvider("oyster", {
+      provideDefinition(document, position) {
+        const line = document.lineAt(position.line).text;
+        const markerMatch = line.match(/Jump_To\s*\[\s*"([^"]+)"/);
+        if (markerMatch) {
+          const marker = markerMatch[1];
+          for (let i = 0; i < document.lineCount; i++) {
+            const l = document.lineAt(i).text;
+            const defMatch = l.match(/Line_Marker\s*\[\s*"([^"]+)"/);
+            if (defMatch && defMatch[1] === marker) {
+              return new vscode.Location(document.uri, new vscode.Position(i, 0));
+            }
+          }
+        }
+        return undefined;
+      }
+    }),
+    // ReferenceProvider: Find all usages of a line marker
+    vscode.languages.registerReferenceProvider("oyster", {
+      provideReferences(document, position, context, token) {
+        const line = document.lineAt(position.line).text;
+        const markerMatch = line.match(/Line_Marker\s*\[\s*"([^"]+)"/);
+        if (!markerMatch) return [];
+        const marker = markerMatch[1];
+        const refs = [];
+        for (let i = 0; i < document.lineCount; i++) {
+          const l = document.lineAt(i).text;
+          if (l.includes(`"${marker}"`)) {
+            refs.push(new vscode.Location(document.uri, new vscode.Position(i, 0)));
+          }
+        }
+        return refs;
+      }
+    }),
+    // DocumentSymbolProvider: List all commands and line markers
+    vscode.languages.registerDocumentSymbolProvider("oyster", {
+      provideDocumentSymbols(document) {
+        const symbols = [];
+        for (let i = 0; i < document.lineCount; i++) {
+          const line = document.lineAt(i).text;
+          const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
+          if (cmdMatch) {
+            const name = cmdMatch[1];
+            const kind = name === "Line_Marker" ? vscode.SymbolKind.Key : vscode.SymbolKind.Function;
+            symbols.push(new vscode.DocumentSymbol(name, '', kind, new vscode.Range(i, 0, i, line.length), new vscode.Range(i, 0, i, line.length)));
+          }
+        }
+        return symbols;
+      }
+    }),
+    // DocumentHighlightProvider: Highlight all usages of a marker under cursor
+    vscode.languages.registerDocumentHighlightProvider("oyster", {
+      provideDocumentHighlights(document, position) {
+        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
+        if (!wordRange) return [];
+        const marker = document.getText(wordRange).replace(/"/g, "");
+        const highlights = [];
+        for (let i = 0; i < document.lineCount; i++) {
+          const l = document.lineAt(i).text;
+          let idx = l.indexOf(`"${marker}"`);
+          while (idx !== -1) {
+            highlights.push(new vscode.DocumentHighlight(new vscode.Range(i, idx, i, idx + marker.length + 2)));
+            idx = l.indexOf(`"${marker}"`, idx + 1);
+          }
+        }
+        return highlights;
+      }
+    }),
+    // SignatureHelpProvider: Show command parameters
+    vscode.languages.registerSignatureHelpProvider(
+      "oyster",
+      {
+        provideSignatureHelp(document, position) {
+          const line = document.lineAt(position.line).text;
+          const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
+          if (!cmdMatch) return null;
+          const cmd = cmdMatch[1];
+          const spec = commands[Object.keys(commands).find(k => k.toLowerCase() === cmd.toLowerCase()) ?? ""];
+          if (!spec) return null;
+          const params = [...spec.required, ...spec.optional];
+          const sig = new vscode.SignatureInformation(cmd + ' [' + params.map(p => p.name).join(', ') + ']', spec.description);
+          sig.parameters = params.map(p => new vscode.ParameterInformation(p.name, p.description));
+          const help = new vscode.SignatureHelp();
+          help.signatures = [sig];
+          help.activeSignature = 0;
+          help.activeParameter = 0;
+          return help;
+        }
+      },
+      '[', ' ', ',',
+    ),
+    // RenameProvider: Rename line markers
+    vscode.languages.registerRenameProvider("oyster", {
+      provideRenameEdits(document, position, newName) {
+        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
+        if (!wordRange) return null;
+        const oldName = document.getText(wordRange).replace(/"/g, "");
+        const edit = new vscode.WorkspaceEdit();
+        for (let i = 0; i < document.lineCount; i++) {
+          const l = document.lineAt(i).text;
+          let idx = l.indexOf(`"${oldName}"`);
+          while (idx !== -1) {
+            edit.replace(document.uri, new vscode.Range(i, idx + 1, i, idx + 1 + oldName.length), newName);
+            idx = l.indexOf(`"${oldName}"`, idx + 1);
+          }
+        }
+        return edit;
+      },
+      prepareRename(document, position) {
+        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
+        if (!wordRange) throw new Error("Not on a marker");
+        return wordRange;
+      }
+    }),
+    // CodeActionProvider: Suggest quick fixes for unknown commands/params
+    vscode.languages.registerCodeActionsProvider("oyster", {
+      provideCodeActions(document, range, context) {
+        const actions = [];
+        for (const diag of context.diagnostics) {
+          if (diag.message.startsWith("Unknown Oyster command")) {
+            actions.push({
+              title: "See available commands",
+              command: "editor.action.showHover",
+              arguments: [document.uri, diag.range.start]
+            });
+          }
+          if (diag.message.startsWith("Missing required parameter")) {
+            actions.push({
+              title: "Add missing parameter",
+              command: "editor.action.insertSnippet",
+              arguments: [
+                { snippet: ' "value"' },
+                document.uri,
+                diag.range.end
+              ]
+            });
+          }
+        }
+        return actions;
+      }
+    }),
+    // Formatting providers: Format Oyster commands (align brackets, spacing)
+    vscode.languages.registerDocumentFormattingEditProvider("oyster", {
+      provideDocumentFormattingEdits(document) {
+        const edits = [];
+        for (let i = 0; i < document.lineCount; i++) {
+          const line = document.lineAt(i);
+          const trimmed = line.text.trim();
+          if (!trimmed) continue;
+          const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (match) {
+            const cmd = match[1];
+            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const formatted = `${cmd} [${params}]`;
+            if (line.text !== formatted) {
+              edits.push(vscode.TextEdit.replace(line.range, formatted));
+            }
+          }
+        }
+        return edits;
+      }
+    }),
+    vscode.languages.registerDocumentRangeFormattingEditProvider("oyster", {
+      provideDocumentRangeFormattingEdits(document, range) {
+        const edits = [];
+        for (let i = range.start.line; i <= range.end.line; i++) {
+          const line = document.lineAt(i);
+          const trimmed = line.text.trim();
+          if (!trimmed) continue;
+          const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (match) {
+            const cmd = match[1];
+            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const formatted = `${cmd} [${params}]`;
+            if (line.text !== formatted) {
+              edits.push(vscode.TextEdit.replace(line.range, formatted));
+            }
+          }
+        }
+        return edits;
+      }
+    }),
+    vscode.languages.registerOnTypeFormattingEditProvider(
+      "oyster",
+      {
+        provideOnTypeFormattingEdits(document, position) {
+          const line = document.lineAt(position.line);
+          const trimmed = line.text.trim();
+          const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (match) {
+            const cmd = match[1];
+            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const formatted = `${cmd} [${params}]`;
+            if (line.text !== formatted) {
+              return [vscode.TextEdit.replace(line.range, formatted)];
+            }
+          }
+          return [];
+        }
+      },
+      '\n', ';'
+    ),
+    // FoldingRangeProvider: Fold between Line_Marker commands
+    vscode.languages.registerFoldingRangeProvider("oyster", {
+      provideFoldingRanges(document) {
+        const ranges = [];
+        let start = null;
+        for (let i = 0; i < document.lineCount; i++) {
+          const line = document.lineAt(i).text;
+          if (line.startsWith("Line_Marker")) {
+            if (start !== null) {
+              ranges.push(new vscode.FoldingRange(start, i - 1));
+            }
+            start = i;
+          }
+        }
+        if (start !== null && start < document.lineCount - 1) {
+          ranges.push(new vscode.FoldingRange(start, document.lineCount - 1));
+        }
+        return ranges;
+      }
+    }),
+    // SelectionRangeProvider: Expand selection to command/parameter block
+    vscode.languages.registerSelectionRangeProvider("oyster", {
+      provideSelectionRanges(document, positions) {
+        return positions.map(pos => {
+          const line = document.lineAt(pos.line);
+          const match = line.text.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (match) {
+            const start = line.text.indexOf("[");
+            const end = line.text.lastIndexOf("]");
+            if (start !== -1 && end !== -1) {
+              return new vscode.SelectionRange(new vscode.Range(pos.line, start, pos.line, end + 1));
+            }
+          }
+          return new vscode.SelectionRange(new vscode.Range(pos, pos));
+        });
+      }
+    }),
+    // InlineValuesProvider: Show parameter values inline for debugging
+    vscode.languages.registerInlineValuesProvider("oyster", {
+      provideInlineValues(document, viewport, context) {
+        const values = [];
+        for (let i = viewport.start.line; i <= viewport.end.line; i++) {
+          const line = document.lineAt(i).text;
+          const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (match) {
+            const params = match[2].split(',');
+            let offset = line.indexOf("[") + 1;
+            for (const param of params) {
+              const trimmed = param.trim();
+              if (trimmed) {
+                const idx = line.indexOf(trimmed, offset);
+                if (idx !== -1) {
+                  values.push(new vscode.InlineValueText(new vscode.Range(i, idx, i, idx + trimmed.length), trimmed));
+                  offset = idx + trimmed.length;
+                }
+              }
+            }
+          }
+        }
+        return values;
+      }
+    }),
+    // LinkedEditingRangeProvider: Edit all instances of a marker at once
+    vscode.languages.registerLinkedEditingRangeProvider("oyster", {
+      provideLinkedEditingRanges(document, position) {
+        const wordRange = document.getWordRangeAtPosition(position, /"[^\"]+"/);
+        if (!wordRange) return null;
+        const marker = document.getText(wordRange).replace(/"/g, "");
+        const ranges = [];
+        for (let i = 0; i < document.lineCount; i++) {
+          const l = document.lineAt(i).text;
+          let idx = l.indexOf(`"${marker}"`);
+          while (idx !== -1) {
+            ranges.push(new vscode.Range(i, idx + 1, i, idx + 1 + marker.length));
+            idx = l.indexOf(`"${marker}"`, idx + 1);
+          }
+        }
+        return { ranges, wordPattern: /\w+/ };
+      }
+    }),
+    // CallHierarchyProvider: Show which commands jump to which markers
+    vscode.languages.registerCallHierarchyProvider("oyster", {
+      prepareCallHierarchy(document, position) {
+        const line = document.lineAt(position.line).text;
+        const jumpMatch = line.match(/Jump_To\s*\[\s*"([^\"]+)"/);
+        if (jumpMatch) {
+          const marker = jumpMatch[1];
+          return [{
+            name: `Jump_To ${marker}`,
+            kind: vscode.SymbolKind.Function,
+            uri: document.uri,
+            range: new vscode.Range(position.line, 0, position.line, line.length),
+            selectionRange: new vscode.Range(position.line, 0, position.line, line.length)
+          }];
+        }
+        return [];
+      },
+      provideCallHierarchyIncomingCalls(item, token) {
+        // Not implemented for simplicity
+        return [];
+      },
+      provideCallHierarchyOutgoingCalls(item, token) {
+        // Not implemented for simplicity
+        return [];
+      }
+    }),
+    // TypeHierarchyProvider: Show command groups (all commands are same group)
+    vscode.languages.registerTypeHierarchyProvider("oyster", {
+      prepareTypeHierarchy(document, position) {
+        const line = document.lineAt(position.line).text;
+        const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
+        if (cmdMatch) {
+          return [{
+            name: cmdMatch[1],
+            kind: vscode.SymbolKind.Function,
+            uri: document.uri,
+            range: new vscode.Range(position.line, 0, position.line, line.length),
+            selectionRange: new vscode.Range(position.line, 0, position.line, line.length)
+          }];
+        }
+        return [];
+      },
+      provideTypeHierarchySupertypes(item, token) {
+        return [];
+      },
+      provideTypeHierarchySubtypes(item, token) {
+        return [];
+      }
+    })
   );
 }
 
