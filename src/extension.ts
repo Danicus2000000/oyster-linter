@@ -163,10 +163,35 @@ export function activate(context: vscode.ExtensionContext) {
           const params = [...spec.required, ...spec.optional];
           const sig = new vscode.SignatureInformation(cmd + ' [' + params.map(p => p.name).join(', ') + ']', spec.description);
           sig.parameters = params.map(p => new vscode.ParameterInformation(p.name, p.description));
+
+          // Determine active parameter
+          let activeParameter = 0;
+          const beforeCursor = line.substring(line.indexOf("[") + 1, position.character);
+          // Check for parameter_name =
+          let foundNamed = false;
+          for (let i = 0; i < params.length; i++) {
+            const regex = new RegExp(`\\b${params[i].name}\\s*=`, 'i');
+            if (regex.test(beforeCursor)) {
+              activeParameter = i;
+              foundNamed = true;
+              break;
+            }
+          }
+          if (!foundNamed) {
+            // Count commas not in quotes
+            let inQuotes = false;
+            let commaCount = 0;
+            for (let i = 0; i < beforeCursor.length; i++) {
+              if (beforeCursor[i] === '"') inQuotes = !inQuotes;
+              if (!inQuotes && beforeCursor[i] === ',') commaCount++;
+            }
+            activeParameter = Math.min(commaCount, params.length - 1);
+          }
+
           const help = new vscode.SignatureHelp();
           help.signatures = [sig];
           help.activeSignature = 0;
-          help.activeParameter = 0;
+          help.activeParameter = activeParameter;
           return help;
         }
       },
