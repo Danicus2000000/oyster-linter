@@ -95,10 +95,9 @@ export function activate(context: vscode.ExtensionContext) {
    */
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
-      {language : "oyster", scheme: "file" },
+      "oyster",
       {
-        provideCompletionItems() {
-          // Always provide completions when a trigger character is typed
+        provideCompletionItems(document, position, token, context) {
           return Object.keys(commands).map((cmd) => {
             const item = new vscode.CompletionItem(
               cmd,
@@ -110,7 +109,8 @@ export function activate(context: vscode.ExtensionContext) {
             return item;
           });
         },
-      }
+      },
+      ...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'.split('')
     )
   );
 
