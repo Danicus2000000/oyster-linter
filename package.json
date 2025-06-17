@@ -4,7 +4,7 @@
   "description": "Lints Oyster 4S scripts for syntax and command errors.",
   "icon": "img/oysterIcon.png",
   "publisher": "AnActualPan",
-  "version": "1.44.1",
+  "version": "1.45.0",
   "engines": {
     "vscode": "^1.101.0"
   },
