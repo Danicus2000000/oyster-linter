@@ -110,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
           });
         },
       },
-      ...'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'.split('')
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
     )
   );
 
