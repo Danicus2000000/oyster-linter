@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
       let md = `**${cmdKey}**`;
       md += `\n\n${spec.description}`;
       md += `\n\nIntroduced in: Oyster **${spec.introducedVersion}**`;
-      md += '\n\nFor more information on this command [check the documentation](https://github.com/Danicus2000000/oyster-linter/tree/main/doc/commands/' + cmdKey +'.md).';
+      md += '\n\nFor more information on this command [check the documentation](https://github.com/Danicus2000000/oyster-linter/tree/main/doc/commands/' + cmdKey + '.md).';
       if (spec.required.length > 0) {
         md += "\n\n**Required parameters:**";
         for (const p of spec.required) {
@@ -70,9 +70,8 @@ export function activate(context: vscode.ExtensionContext) {
       if (spec.optional.length > 0) {
         md += "\n\n**Optional parameters:**";
         for (const p of spec.optional) {
-          md += `\n- \`${p.name}\` (${p.type}${
-            p.default !== undefined ? ", default: " + p.default : ""
-          })`;
+          md += `\n- \`${p.name}\` (${p.type}${p.default !== undefined ? ", default: " + p.default : ""
+            })`;
           md += `: ${p.description}`;
         }
       }
@@ -88,12 +87,8 @@ export function activate(context: vscode.ExtensionContext) {
     },
   });
 
-  /**
-   * Provides command name completions for Oyster 4S commands in Oyster files.
-   * Suggests command names from the commands object at the start of a line or after whitespace.
-   * Suggestions appear on Ctrl+Space or after typing a letter/underscore at the start of a line or after whitespace.
-   */
   context.subscriptions.push(
+    // CompletionItemProvider: Provide command completions
     vscode.languages.registerCompletionItemProvider(
       "oyster",
       {
@@ -111,26 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
         },
       },
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
-    )
-  );
-
-  context.subscriptions.push(
-    // DocumentSymbolProvider: List all commands and line markers
-    vscode.languages.registerDocumentSymbolProvider("oyster", {
-      provideDocumentSymbols(document) {
-        const symbols = [];
-        for (let i = 0; i < document.lineCount; i++) {
-          const line = document.lineAt(i).text;
-          const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
-          if (cmdMatch) {
-            const name = cmdMatch[1];
-            const kind = name === "Line_Marker" ? vscode.SymbolKind.Key : vscode.SymbolKind.Function;
-            symbols.push(new vscode.DocumentSymbol(name, '', kind, new vscode.Range(i, 0, i, line.length), new vscode.Range(i, 0, i, line.length)));
-          }
-        }
-        return symbols;
-      }
-    }),
+    ),
     // DocumentHighlightProvider: Highlight all usages of a marker under cursor
     vscode.languages.registerDocumentHighlightProvider("oyster", {
       provideDocumentHighlights(document, position) {
@@ -318,4 +294,4 @@ function lintAndReport(
 /**
  * Deactivates the Oyster extension.
  */
-export function deactivate() {}
+export function deactivate() { }
