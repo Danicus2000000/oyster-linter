@@ -93,6 +93,12 @@ export function activate(context: vscode.ExtensionContext) {
       "oyster",
       {
         provideCompletionItems(document, position, token, context) {
+          const line = document.lineAt(position.line).text;
+          const bracketIdx = line.indexOf("[");
+          // Only show completions if cursor is before the first '[' or if there is no '['
+          if (bracketIdx !== -1 && position.character > bracketIdx) {
+            return undefined;
+          }
           return Object.keys(commands).map((cmd) => {
             const item = new vscode.CompletionItem(
               cmd,
