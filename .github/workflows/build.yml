@@ -33,10 +33,7 @@ jobs:
         run: npm ci
 
       - name: Compile TypeScript
-        run: npx tsc -p ./
-
-      - name: Lint code
-        run: npx tsc --noEmit
+        run: npx tsc
 
       - name: Build with webpack
         run: npx webpack --config webpack.config.js
