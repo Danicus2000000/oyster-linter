@@ -12,7 +12,7 @@ The Oyster Linter is a Visual Studio Code extension designed to aid in the creat
 ## Getting Started
 
 1. **Install the Extension**: Download and install the Oyster Linter extension from the VS Code Marketplace.
-2. **Set Language Mode**: Open an Oyster 4s file and set the language mode to `Oyster 4s`.
+2. **Set Language Mode**: Open an Oyster 4s file (.osf) the language should automatically be detected, if not set the language mode to `Oyster 4s`.
 3. **Start Coding**: Begin writing Oyster 4s commands. The linter will automatically validate your code and provide suggestions.
 
 ## Oyster Command Spec
@@ -21,8 +21,8 @@ For information on how Oyster commands should be structured and what commands ex
 
 ## Example Workflow
 
-1. Open a new file and set the language mode to `Oyster 4s`,
+1. Open a new .osf file the language should automatically be detected, if not set the language mode to `Oyster 4s`,
 2. Type a command, such as `act_speak []`,
 3. Hover over the command to view its description and parameters,
 4. Fill in the parameters as required,
-6. Repeat until you've written the desired script.
+5. Repeat until you've written the desired script.
