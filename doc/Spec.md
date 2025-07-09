@@ -138,11 +138,11 @@ It's as simple as it sounds, just leave a blank line and Oyster will ignore it w
 
 ### A comment
 
-Comments start with '//' and may only span one line.
+Comments start with '#' and may only span one line.
 Comments cannot occur on the same line as a command.
-An example would be:
+An example of one valid and one invalid comment would be:
 ```OScript
-// I'm a valid comment
+# I'm a valid comment
 
-act_speak ["Pineapple"] // I'm going to cause problems!
+act_speak ["Pineapple"] # I'm going to cause problems!
 ```
