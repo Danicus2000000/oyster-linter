@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@types/vscode": "^1.105.0",
+    "@types/vscode": "^1.106.1",
     "@vscode/vsce": "^3.7.0",
     "clean-webpack-plugin": "^4.0.0",
     "path": "^0.12.7",
