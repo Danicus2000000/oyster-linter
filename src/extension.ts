@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { lintOysterDocument } from "./oysterLinter";
 import { commands } from "./commands";
+import { CommandSpec } from "./types";
 
 /**
  * Activates the Oyster extension.
@@ -23,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
     }),
     vscode.workspace.onDidCloseTextDocument((doc) => {
       diagnosticCollection.delete(doc.uri);
-    })
+    }),
   );
 
   // Lint all open Oyster docs on activation
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
       const cmd = match[1];
       // Make command lookup case-insensitive
       const cmdKey = Object.keys(commands).find(
-        (k) => k.toLowerCase() === cmd.toLowerCase()
+        (k) => k.toLowerCase() === cmd.toLowerCase(),
       );
       if (!cmdKey) return;
       const spec = commands[cmdKey];
@@ -56,34 +57,10 @@ export function activate(context: vscode.ExtensionContext) {
       if (position.character < cmdStart || position.character > cmdEnd) {
         return;
       }
-      let md = `**${cmdKey}**`;
-      md += `\n\n${spec.description}`;
-      md += `\n\nIntroduced in: Oyster **${spec.introducedVersion}**`;
-      md += '\n\nFor more information on this command [check the documentation](https://github.com/Danicus2000000/oyster-linter/tree/main/doc/commands/' + cmdKey + '.md).';
-      if (spec.required.length > 0) {
-        md += "\n\n**Required parameters:**";
-        for (const p of spec.required) {
-          md += `\n- \`${p.name}\` (${p.type}): ${p.description}`;
-        }
-      }
 
-      if (spec.optional.length > 0) {
-        md += "\n\n**Optional parameters:**";
-        for (const p of spec.optional) {
-          md += `\n- \`${p.name}\` (${p.type}${p.default !== undefined ? ", default: " + p.default : ""
-            })`;
-          md += `: ${p.description}`;
-        }
-      }
-
-      if (spec.compatibleGames.length > 0) {
-        md += `\n\n**Compatible games:**`;
-        for (const game of spec.compatibleGames) {
-          md += `\n- ${game}`;
-        }
-      }
-
-      return new vscode.Hover(new vscode.MarkdownString(md));
+      return new vscode.Hover(
+        new vscode.MarkdownString(formatOysterCommandPreview(cmdKey, spec)),
+      );
     },
   });
 
@@ -102,16 +79,21 @@ export function activate(context: vscode.ExtensionContext) {
           return Object.keys(commands).map((cmd) => {
             const item = new vscode.CompletionItem(
               cmd,
-              vscode.CompletionItemKind.Function
+              vscode.CompletionItemKind.Function,
             );
-            item.detail = commands[cmd].description;
+
+            const spec = commands[cmd];
+            item.detail =
+              spec.description +
+              "\nSupported Oyster versions: ≥" +
+              spec.introducedVersion;
             item.insertText = cmd;
             item.commitCharacters = ["["];
             return item;
           });
         },
       },
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_",
     ),
     // DocumentHighlightProvider: Highlight all usages of a marker under cursor
     vscode.languages.registerDocumentHighlightProvider("oyster", {
@@ -124,12 +106,16 @@ export function activate(context: vscode.ExtensionContext) {
           const l = document.lineAt(i).text;
           let idx = l.indexOf(`"${marker}"`);
           while (idx !== -1) {
-            highlights.push(new vscode.DocumentHighlight(new vscode.Range(i, idx, i, idx + marker.length + 2)));
+            highlights.push(
+              new vscode.DocumentHighlight(
+                new vscode.Range(i, idx, i, idx + marker.length + 2),
+              ),
+            );
             idx = l.indexOf(`"${marker}"`, idx + 1);
           }
         }
         return highlights;
-      }
+      },
     }),
     // SignatureHelpProvider: Show command parameters
     vscode.languages.registerSignatureHelpProvider(
@@ -140,19 +126,34 @@ export function activate(context: vscode.ExtensionContext) {
           const cmdMatch = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[/);
           if (!cmdMatch) return null;
           const cmd = cmdMatch[1];
-          const spec = commands[Object.keys(commands).find(k => k.toLowerCase() === cmd.toLowerCase()) ?? ""];
+          const spec =
+            commands[
+              Object.keys(commands).find(
+                (k) => k.toLowerCase() === cmd.toLowerCase(),
+              ) ?? ""
+            ];
           if (!spec) return null;
           const params = [...spec.required, ...spec.optional];
-          const sig = new vscode.SignatureInformation(cmd + ' [' + params.map(p => p.name).join(', ') + ']', spec.description);
-          sig.parameters = params.map(p => new vscode.ParameterInformation(p.name, p.description));
+          const sig = new vscode.SignatureInformation(
+            cmd + " [" + params.map((p) => p.name).join(", ") + "]",
+            spec.description +
+              "\nSupported Oyster versions: ≥" +
+              spec.introducedVersion,
+          );
+          sig.parameters = params.map(
+            (p) => new vscode.ParameterInformation(p.name, p.description),
+          );
 
           // Determine active parameter
           let activeParameter = 0;
-          const beforeCursor = line.substring(line.indexOf("[") + 1, position.character);
+          const beforeCursor = line.substring(
+            line.indexOf("[") + 1,
+            position.character,
+          );
           // Check for parameter_name =
           let foundNamed = false;
           for (let i = 0; i < params.length; i++) {
-            const regex = new RegExp(`\\b${params[i].name}\\s*=`, 'i');
+            const regex = new RegExp(`\\b${params[i].name}\\s*=`, "i");
             if (regex.test(beforeCursor)) {
               activeParameter = i;
               foundNamed = true;
@@ -165,7 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
             let commaCount = 0;
             for (let i = 0; i < beforeCursor.length; i++) {
               if (beforeCursor[i] === '"') inQuotes = !inQuotes;
-              if (!inQuotes && beforeCursor[i] === ',') commaCount++;
+              if (!inQuotes && beforeCursor[i] === ",") commaCount++;
             }
             activeParameter = Math.min(commaCount, params.length - 1);
           }
@@ -175,9 +176,11 @@ export function activate(context: vscode.ExtensionContext) {
           help.activeSignature = 0;
           help.activeParameter = activeParameter;
           return help;
-        }
+        },
       },
-      '[', ' ', ',',
+      "[",
+      " ",
+      ",",
     ),
     // Formatting providers: Format Oyster commands (align brackets, spacing)
     vscode.languages.registerDocumentFormattingEditProvider("oyster", {
@@ -190,7 +193,10 @@ export function activate(context: vscode.ExtensionContext) {
           const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
           if (match) {
             const cmd = match[1];
-            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const params = match[2]
+              .split(",")
+              .map((p) => p.trim())
+              .join(", ");
             const formatted = `${cmd} [${params}]`;
             if (line.text !== formatted) {
               edits.push(vscode.TextEdit.replace(line.range, formatted));
@@ -198,7 +204,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
         }
         return edits;
-      }
+      },
     }),
     vscode.languages.registerDocumentRangeFormattingEditProvider("oyster", {
       provideDocumentRangeFormattingEdits(document, range) {
@@ -210,7 +216,10 @@ export function activate(context: vscode.ExtensionContext) {
           const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
           if (match) {
             const cmd = match[1];
-            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const params = match[2]
+              .split(",")
+              .map((p) => p.trim())
+              .join(", ");
             const formatted = `${cmd} [${params}]`;
             if (line.text !== formatted) {
               edits.push(vscode.TextEdit.replace(line.range, formatted));
@@ -218,7 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
         }
         return edits;
-      }
+      },
     }),
     vscode.languages.registerOnTypeFormattingEditProvider(
       "oyster",
@@ -229,33 +238,41 @@ export function activate(context: vscode.ExtensionContext) {
           const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
           if (match) {
             const cmd = match[1];
-            const params = match[2].split(',').map(p => p.trim()).join(', ');
+            const params = match[2]
+              .split(",")
+              .map((p) => p.trim())
+              .join(", ");
             const formatted = `${cmd} [${params}]`;
             if (line.text !== formatted) {
               return [vscode.TextEdit.replace(line.range, formatted)];
             }
           }
           return [];
-        }
+        },
       },
-      '\n', ';'
+      "\n",
+      ";",
     ),
     // SelectionRangeProvider: Expand selection to command/parameter block
     vscode.languages.registerSelectionRangeProvider("oyster", {
       provideSelectionRanges(document, positions) {
-        return positions.map(pos => {
+        return positions.map((pos) => {
           const line = document.lineAt(pos.line);
-          const match = line.text.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          const match = line.text.match(
+            /^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/,
+          );
           if (match) {
             const start = line.text.indexOf("[");
             const end = line.text.lastIndexOf("]");
             if (start !== -1 && end !== -1) {
-              return new vscode.SelectionRange(new vscode.Range(pos.line, start, pos.line, end + 1));
+              return new vscode.SelectionRange(
+                new vscode.Range(pos.line, start, pos.line, end + 1),
+              );
             }
           }
           return new vscode.SelectionRange(new vscode.Range(pos, pos));
         });
-      }
+      },
     }),
     // InlineValuesProvider: Show parameter values inline for debugging
     vscode.languages.registerInlineValuesProvider("oyster", {
@@ -265,14 +282,19 @@ export function activate(context: vscode.ExtensionContext) {
           const line = document.lineAt(i).text;
           const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
           if (match) {
-            const params = match[2].split(',');
+            const params = match[2].split(",");
             let offset = line.indexOf("[") + 1;
             for (const param of params) {
               const trimmed = param.trim();
               if (trimmed) {
                 const idx = line.indexOf(trimmed, offset);
                 if (idx !== -1) {
-                  values.push(new vscode.InlineValueText(new vscode.Range(i, idx, i, idx + trimmed.length), trimmed));
+                  values.push(
+                    new vscode.InlineValueText(
+                      new vscode.Range(i, idx, i, idx + trimmed.length),
+                      trimmed,
+                    ),
+                  );
                   offset = idx + trimmed.length;
                 }
               }
@@ -280,8 +302,9 @@ export function activate(context: vscode.ExtensionContext) {
           }
         }
         return values;
-      }
-    }));
+      },
+    }),
+  );
 }
 
 /**
@@ -291,10 +314,54 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function lintAndReport(
   doc: vscode.TextDocument,
-  collection: vscode.DiagnosticCollection
-) {
+  collection: vscode.DiagnosticCollection,
+): void {
   const diagnostics = lintOysterDocument(doc);
   collection.set(doc.uri, diagnostics);
+}
+
+/**
+ * Fomats a command preview for display in hover documentation.
+ * @param commandName The name of the command.
+ * @param commandSpec The specification of the command, including description, parameters, and compatible games.
+ * @returns A formatted markdown string summarizing the command for display in a hover tooltip.
+ */
+function formatOysterCommandPreview(
+  commandName: string,
+  commandSpec: CommandSpec,
+): string {
+  let md = `**${commandName}**`;
+  md += `\n\n${commandSpec.description}`;
+  md += `\n\nSupported Oyster versions: ≥${commandSpec.introducedVersion}`;
+  md +=
+    "\n\nFor more information on this command [check the documentation](https://oyster.abulman.com/supportedcommands/" +
+    commandSpec.docUrl +
+    ").";
+  if (commandSpec.required.length > 0) {
+    md += "\n\n**Required parameters:**";
+    for (const p of commandSpec.required) {
+      md += `\n- \`${p.name}\` (${p.type}): ${p.description}`;
+    }
+  }
+
+  if (commandSpec.optional.length > 0) {
+    md += "\n\n**Optional parameters:**";
+    for (const p of commandSpec.optional) {
+      md += `\n- \`${p.name}\` (${p.type}${
+        p.default !== undefined ? ", default: " + p.default : ""
+      })`;
+      md += `: ${p.description}`;
+    }
+  }
+
+  if (commandSpec.compatibleGames.length > 0) {
+    md += `\n\n**Compatible games:**`;
+    for (const game of commandSpec.compatibleGames) {
+      md += `\n- ${game}`;
+    }
+  }
+
+  return md;
 }
 
 /**

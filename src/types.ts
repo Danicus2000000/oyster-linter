@@ -13,6 +13,7 @@ export interface CommandParam {
 export interface CommandSpec {
   description: string;
   introducedVersion: string;
+  docUrl: string;
   compatibleGames: string[];
   required: CommandParam[];
   optional: CommandParam[];
