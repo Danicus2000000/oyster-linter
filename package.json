@@ -6,7 +6,7 @@
   "publisher": "AnActualPan",
   "version": "1.46.5",
   "engines": {
-    "vscode": "^1.108.1"
+    "vscode": "^1.109.0"
   },
   "categories": [
     "Linters"
