@@ -85,8 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
             const spec = commands[cmd];
             item.detail =
               spec.description +
-              "\nSupported Oyster versions: ≥" +
-              spec.introducedVersion;
+              `\nSupported Oyster versions: ≥ ${spec.introducedVersion}`;
             item.insertText = cmd;
             item.commitCharacters = ["["];
             return item;
@@ -137,8 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
           const sig = new vscode.SignatureInformation(
             cmd + " [" + params.map((p) => p.name).join(", ") + "]",
             spec.description +
-              "\nSupported Oyster versions: ≥" +
-              spec.introducedVersion,
+              `\nSupported Oyster versions: ≥ ${spec.introducedVersion}`,
           );
           sig.parameters = params.map(
             (p) => new vscode.ParameterInformation(p.name, p.description),
@@ -332,7 +330,7 @@ function formatOysterCommandPreview(
 ): string {
   let md = `**${commandName}**`;
   md += `\n\n${commandSpec.description}`;
-  md += `\n\nSupported Oyster versions: ≥${commandSpec.introducedVersion}`;
+  md += `\n\nSupported Oyster versions: ≥ ${commandSpec.introducedVersion}`;
   md +=
     "\n\nFor more information on this command [check the documentation](https://oyster.abulman.com/supportedcommands/" +
     commandSpec.docUrl +
