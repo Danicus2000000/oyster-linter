@@ -339,14 +339,47 @@ export function lintOysterDocument(
             );
           }
         }
-      } else if (!parseValue(p, spec.required[j].type)) {
-        diagnostics.push(
-          new vscode.Diagnostic(
-            line.range,
-            `Parameter ${spec.required[j].name} should be ${spec.required[j].type}`,
-            vscode.DiagnosticSeverity.Error,
-          ),
-        );
+      } else {
+        // If it's a string spec and an interpolated string (starts with $"...")
+        if (spec.required[j].type === "string") {
+          const interpMatch = p.match(/^\$"(?:[^"\\]|\\.)*"$/m);
+          if (interpMatch) {
+            const varRegex = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
+            let m: RegExpExecArray | null;
+            while ((m = varRegex.exec(p))) {
+              const vn = m[1];
+              if (!variables.has(vn)) {
+                diagnostics.push(
+                  new vscode.Diagnostic(
+                    line.range,
+                    `Unknown variable \$${vn} used in interpolated string for parameter ${spec.required[j].name}`,
+                    vscode.DiagnosticSeverity.Error,
+                  ),
+                );
+              }
+            }
+            // continue validation: ensure overall value matches expected pattern
+            if (!parseValue(p, spec.required[j].type)) {
+              diagnostics.push(
+                new vscode.Diagnostic(
+                  line.range,
+                  `Parameter ${spec.required[j].name} should be ${spec.required[j].type}`,
+                  vscode.DiagnosticSeverity.Error,
+                ),
+              );
+            }
+            continue;
+          }
+        }
+        if (!parseValue(p, spec.required[j].type)) {
+          diagnostics.push(
+            new vscode.Diagnostic(
+              line.range,
+              `Parameter ${spec.required[j].name} should be ${spec.required[j].type}`,
+              vscode.DiagnosticSeverity.Error,
+            ),
+          );
+        }
       }
     }
     // Check optional
@@ -402,6 +435,36 @@ export function lintOysterDocument(
           }
         }
       } else if (!parseValue(val, optSpec.type)) {
+        // If it's a string optional and an interpolated string, check variables inside
+        if (optSpec.type === "string") {
+          const interpMatch = val.match(/^\$"(?:[^"\\]|\\.)*"$/m);
+          if (interpMatch) {
+            const varRegex = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
+            let m: RegExpExecArray | null;
+            while ((m = varRegex.exec(val))) {
+              const vn = m[1];
+              if (!variables.has(vn)) {
+                diagnostics.push(
+                  new vscode.Diagnostic(
+                    line.range,
+                    `Unknown variable \$${vn} used in interpolated string for optional parameter ${key}`,
+                    vscode.DiagnosticSeverity.Error,
+                  ),
+                );
+              }
+            }
+            if (!parseValue(val, optSpec.type)) {
+              diagnostics.push(
+                new vscode.Diagnostic(
+                  line.range,
+                  `Optional parameter '${key}' should be ${optSpec.type}`,
+                  vscode.DiagnosticSeverity.Error,
+                ),
+              );
+            }
+            continue;
+          }
+        }
         diagnostics.push(
           new vscode.Diagnostic(
             line.range,
