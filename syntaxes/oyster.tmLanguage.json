@@ -35,6 +35,34 @@
         }
       ]
     },
+    "dollarString": {
+      "begin": "\\$\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.oyster"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.oyster"
+        }
+      },
+      "name": "string.quoted.double.interpolated.oyster",
+      "patterns": [
+        {
+          "name": "variable.other.interpolated.oyster",
+          "match": "\\{[A-Za-z][A-Za-z0-9_]*\\}"
+        },
+        {
+          "name": "constant.character.escape.oyster",
+          "match": "\\."
+        },
+        {
+          "include": "#stringcontent"
+        }
+      ]
+    },
     "stringcontent": {
       "patterns": [
         {
@@ -85,6 +113,9 @@
         },
         {
           "include": "#string"
+        },
+        {
+          "include": "#dollarString"
         },
         {
           "include": "#comments"

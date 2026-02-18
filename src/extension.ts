@@ -64,6 +64,102 @@ export function activate(context: vscode.ExtensionContext) {
     },
   });
 
+  // Hover provider: show variable type when hovering over $var or {var} inside $"..."
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider("oyster", {
+      provideHover(document, position) {
+        // Check for $var token
+        const varRange = document.getWordRangeAtPosition(
+          position,
+          /\$[A-Za-z][A-Za-z0-9_]*/,
+        );
+        let varName: string | undefined;
+        if (varRange) {
+          varName = document.getText(varRange).substring(1);
+        } else {
+          // Check for {var} inside the line (interpolated string)
+          const line = document.lineAt(position.line).text;
+          const regex = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
+          let m: RegExpExecArray | null = null;
+          while ((m = regex.exec(line)) !== null) {
+            const start = m.index;
+            const end = start + m[0].length;
+            if (position.character >= start && position.character <= end) {
+              varName = m[1];
+              break;
+            }
+          }
+        }
+
+        if (!varName) return null;
+
+        // Scan document for Set_*Var declarations to find the variable type
+        for (let i = 0; i < document.lineCount; i++) {
+          const text = document.lineAt(i).text.trim();
+          if (!text || text.startsWith("#")) continue;
+          const match = text.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*)\]$/);
+          if (!match) continue;
+          const cmd = match[1].toLowerCase();
+          if (
+            cmd !== "set_intvar" &&
+            cmd !== "set_boolvar" &&
+            cmd !== "set_stringvar"
+          )
+            continue;
+          const paramStr = match[2];
+          const params: string[] = [];
+          let current = "";
+          let inString = false;
+          let escape = false;
+          for (let idx = 0; idx < paramStr.length; idx++) {
+            const ch = paramStr[idx];
+            if (escape) {
+              current += ch;
+              escape = false;
+              continue;
+            }
+            if (ch === "\\") {
+              current += ch;
+              escape = true;
+              continue;
+            }
+            if (ch === '"') {
+              inString = !inString;
+              current += ch;
+              continue;
+            }
+            if (ch === "," && !inString) {
+              params.push(current.trim());
+              current = "";
+              continue;
+            }
+            current += ch;
+          }
+          if (current.trim().length > 0) params.push(current.trim());
+          if (params.length >= 1) {
+            const nameParam = params[0];
+            const nameMatch = nameParam.match(/^"([A-Za-z][A-Za-z0-9_]*)"$/);
+            if (nameMatch && nameMatch[1] === varName) {
+              const varType =
+                cmd === "set_intvar"
+                  ? "int"
+                  : cmd === "set_boolvar"
+                    ? "bool"
+                    : "string";
+              const md = new vscode.MarkdownString(
+                `**$${varName}** — type: ${varType}`,
+              );
+              md.appendText(` (declared at line ${i + 1})`);
+              return new vscode.Hover(md);
+            }
+          }
+        }
+
+        return null;
+      },
+    }),
+  );
+
   context.subscriptions.push(
     // CompletionItemProvider: Provide command completions
     vscode.languages.registerCompletionItemProvider(
@@ -97,22 +193,45 @@ export function activate(context: vscode.ExtensionContext) {
     // DocumentHighlightProvider: Highlight all usages of a marker under cursor
     vscode.languages.registerDocumentHighlightProvider("oyster", {
       provideDocumentHighlights(document, position) {
-        const wordRange = document.getWordRangeAtPosition(position, /"[^"]+"/);
+        // Accept either quoted markers or variables like $Var
+        const wordRange = document.getWordRangeAtPosition(
+          position,
+          /(\$[A-Za-z][A-Za-z0-9_]*|"[^"]+")/,
+        );
         if (!wordRange) return [];
-        const marker = document.getText(wordRange).replace(/"/g, "");
-        const highlights = [];
-        for (let i = 0; i < document.lineCount; i++) {
-          const l = document.lineAt(i).text;
-          let idx = l.indexOf(`"${marker}"`);
-          while (idx !== -1) {
-            highlights.push(
-              new vscode.DocumentHighlight(
-                new vscode.Range(i, idx, i, idx + marker.length + 2),
-              ),
-            );
-            idx = l.indexOf(`"${marker}"`, idx + 1);
+        const token = document.getText(wordRange);
+        const highlights: vscode.DocumentHighlight[] = [];
+
+        if (token.startsWith('"')) {
+          const marker = token.replace(/"/g, "");
+          for (let i = 0; i < document.lineCount; i++) {
+            const l = document.lineAt(i).text;
+            let idx = l.indexOf(`"${marker}"`);
+            while (idx !== -1) {
+              highlights.push(
+                new vscode.DocumentHighlight(
+                  new vscode.Range(i, idx, i, idx + marker.length + 2),
+                ),
+              );
+              idx = l.indexOf(`"${marker}"`, idx + 1);
+            }
+          }
+        } else if (token.startsWith("$")) {
+          const varName = token.substring(1);
+          for (let i = 0; i < document.lineCount; i++) {
+            const l = document.lineAt(i).text;
+            let idx = l.indexOf(`$${varName}`);
+            while (idx !== -1) {
+              highlights.push(
+                new vscode.DocumentHighlight(
+                  new vscode.Range(i, idx, i, idx + varName.length + 1),
+                ),
+              );
+              idx = l.indexOf(`$${varName}`, idx + 1);
+            }
           }
         }
+
         return highlights;
       },
     }),
