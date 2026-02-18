@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CommandParam, CommandSpec } from "./types";
-import { commands } from "./commands";
+import { commands, GameAliases } from "./commands";
 
 /**
  * Parses a command parameter value string and checks if it matches the expected type.
@@ -20,6 +20,22 @@ function parseValue(str: string, type: CommandParam["type"]): boolean {
   if (type === "bool")
     return /^(true|false)$/i.test(s) || /^\$[A-Za-z][A-Za-z0-9_]*$/.test(s);
   return false;
+}
+
+function getCanonicalGame(name: string | undefined): string | undefined {
+  if (!name) return undefined;
+  for (const [canon, aliases] of GameAliases) {
+    if (canon === name) return canon;
+    if (aliases && aliases.includes(name)) return canon;
+  }
+  return name;
+}
+
+function versionToNumber(v: string | undefined): number | undefined {
+  if (!v) return undefined;
+  const cleaned = v.replace(/\./g, "");
+  const n = parseInt(cleaned, 10);
+  return Number.isNaN(n) ? undefined : n;
 }
 
 /**
@@ -44,6 +60,9 @@ export function lintOysterDocument(
     newType: CommandParam["type"];
   }[] = [];
   // First pass: collect variable declarations (Set_IntVar, Set_BoolVar, Set_StringVar)
+  // Also collect any `meta` entries (game/version)
+  let metaGame: string | undefined;
+  let metaVersion: string | undefined;
   for (let i = 0; i < doc.lineCount; i++) {
     const line = doc.lineAt(i);
     const text = line.text.trim();
@@ -122,6 +141,50 @@ export function lintOysterDocument(
         }
       }
     }
+    // collect meta entries
+    if (cmdKey === "meta") {
+      // split params by commas outside quotes
+      const params: string[] = [];
+      let current = "";
+      let inString = false;
+      let escape = false;
+      for (let idx = 0; idx < paramStr.length; idx++) {
+        const char = paramStr[idx];
+        if (escape) {
+          current += char;
+          escape = false;
+          continue;
+        }
+        if (char === "\\") {
+          current += char;
+          escape = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+          current += char;
+          continue;
+        }
+        if (char === "," && !inString) {
+          params.push(current.trim());
+          current = "";
+          continue;
+        }
+        current += char;
+      }
+      if (current.trim().length > 0) params.push(current.trim());
+      for (const p of params) {
+        const eq = p.indexOf("=");
+        if (eq === -1) continue;
+        const key = p.substring(0, eq).trim().toLowerCase();
+        let val = p.substring(eq + 1).trim();
+        // strip surrounding quotes if present
+        const qm = val.match(/^"(.*)"$/);
+        if (qm) val = qm[1];
+        if (key === "game") metaGame = val;
+        if (key === "version") metaVersion = val;
+      }
+    }
   }
 
   // After collecting declarations, emit diagnostics for any type-conflicts using the final lastLine
@@ -171,6 +234,37 @@ export function lintOysterDocument(
         ),
       );
       continue;
+    }
+    // If meta info present, check version and target game compatibility
+    // metaGame/metaVersion are the last-seen values from the first pass
+    if (metaVersion && spec.introducedVersion) {
+      const specVer = versionToNumber(spec.introducedVersion);
+      const fileVer = versionToNumber(metaVersion);
+      if (specVer !== undefined && fileVer !== undefined && specVer > fileVer) {
+        diagnostics.push(
+          new vscode.Diagnostic(
+            line.range,
+            `Command ${cmd} was introduced in Oyster ${spec.introducedVersion} which is newer than script version ${metaVersion}`,
+            vscode.DiagnosticSeverity.Warning,
+          ),
+        );
+      }
+    }
+
+    if (metaGame && spec.compatibleGames && spec.compatibleGames.length > 0) {
+      const canonicalTarget = getCanonicalGame(metaGame);
+      if (
+        canonicalTarget &&
+        !spec.compatibleGames.find((g) => g === canonicalTarget)
+      ) {
+        diagnostics.push(
+          new vscode.Diagnostic(
+            line.range,
+            `Command ${cmd} may not be compatible with target game ${metaGame} (compatible: ${spec.compatibleGames.join(", ")})`,
+            vscode.DiagnosticSeverity.Warning,
+          ),
+        );
+      }
     }
     // Split params: required first, then optional as key=value
     // Only split on commas outside of quotes
