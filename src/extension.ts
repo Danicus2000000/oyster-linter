@@ -78,15 +78,49 @@ export function activate(context: vscode.ExtensionContext) {
           varName = document.getText(varRange).substring(1);
         } else {
           // Check for {var} inside the line (interpolated string)
+          // Also support hovering over the identifier inside an interpolated $"...{var}..." string
           const line = document.lineAt(position.line).text;
-          const regex = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
+          const braceRegex = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
           let m: RegExpExecArray | null = null;
-          while ((m = regex.exec(line)) !== null) {
+          while ((m = braceRegex.exec(line)) !== null) {
             const start = m.index;
             const end = start + m[0].length;
             if (position.character >= start && position.character <= end) {
               varName = m[1];
               break;
+            }
+          }
+
+          if (!varName) {
+            // Try matching a plain identifier under the cursor and ensure it's inside an interpolated $"..." string
+            const wordRange = document.getWordRangeAtPosition(
+              position,
+              /[A-Za-z][A-Za-z0-9_]*/,
+            );
+            if (wordRange) {
+              const word = document.getText(wordRange);
+              // Determine start index of this word in the line (use range as fallback)
+              let startIdx = line.indexOf(word, wordRange.start.character);
+              if (startIdx === -1) startIdx = wordRange.start.character;
+              const endIdx = startIdx + word.length;
+
+              const charBefore = startIdx > 0 ? line[startIdx - 1] : "";
+              const charAfter = endIdx < line.length ? line[endIdx] : "";
+
+              // Heuristic: either the word is inside explicit braces {word}, or it lies inside an interpolated $"..." region
+              const quoteIdx = line.lastIndexOf('"', startIdx - 1);
+              const hasInterpolMarker =
+                quoteIdx > 0 && line[quoteIdx - 1] === "$";
+              const closingQuoteIdx = line.indexOf('"', startIdx);
+
+              if (
+                (charBefore === "{" && charAfter === "}") ||
+                (hasInterpolMarker &&
+                  quoteIdx !== -1 &&
+                  closingQuoteIdx > quoteIdx)
+              ) {
+                varName = word;
+              }
             }
           }
         }
