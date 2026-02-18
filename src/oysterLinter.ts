@@ -251,7 +251,12 @@ export function lintOysterDocument(
       }
     }
 
-    if (metaGame && spec.compatibleGames && spec.compatibleGames.length > 0) {
+    if (
+      metaGame &&
+      spec.compatibleGames &&
+      spec.compatibleGames.length > 0 &&
+      !spec.compatibleGames.includes("Base")
+    ) {
       const canonicalTarget = getCanonicalGame(metaGame);
       if (
         canonicalTarget &&
