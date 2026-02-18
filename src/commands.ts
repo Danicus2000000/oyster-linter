@@ -1,6 +1,18 @@
 import { CommandMap } from "./types";
 
 /**
+ * A map of game names to their respective aliases. This is used to determine which commands are compatible with which games, as well as for documentation purposes when listing compatible games for a command.
+ */
+export const GameAliases: Map<string, string[]> = new Map([
+  ["Base", ["Base"]],
+  ["Christmas at Greyling Grove", ["Christmas at Greyling Grove", "GroveGame"]],
+  [
+    "Speed Dating for the Socially Inept",
+    ["Speed Dating for the Socially Inept", "IneptDateGame"],
+  ],
+]);
+
+/**
  * Defines the commands available in the Oyster scripting language.
  */
 export const commands: CommandMap = {
