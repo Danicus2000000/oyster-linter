@@ -17,7 +17,7 @@ The Oyster Linter is a Visual Studio Code extension designed to aid in the creat
 
 ## Oyster Command Spec
 
-For information on how Oyster commands should be structured and what commands exist, [read here](doc/Spec.md).
+For information on how Oyster commands should be structured and what commands exist, [read the documentation here](https://oyster.abulman.com/).
 
 ## Example Workflow
 
