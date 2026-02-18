@@ -17,9 +17,13 @@
       {
         "id": "oyster",
         "aliases": [
-          "Oyster 4S",
-          "oyster"
+          "Oyster 4.1.0",
+          "Oyster"
         ],
+        "icon": {
+          "light": "img/oysterIcon.png",
+          "dark": "img/oysterIcon.png"
+        },
         "extensions": [
           ".osf"
         ],
