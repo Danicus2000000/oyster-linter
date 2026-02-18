@@ -68,8 +68,15 @@
       "match": "\\b(?:True|False)\\b",
       "name": "constant.language.oyster"
     },
+    "variable": {
+      "match": "\\$[A-Za-z][A-Za-z0-9_]*",
+      "name": "variable.other.oyster"
+    },
     "value": {
       "patterns": [
+        {
+          "include": "#variable"
+        },
         {
           "include": "#constant"
         },
