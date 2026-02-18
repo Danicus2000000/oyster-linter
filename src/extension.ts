@@ -179,9 +179,9 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             const spec = commands[cmd];
-            item.detail =
-              spec.description +
-              `\nSupported Oyster versions: ≥ ${spec.introducedVersion}`;
+            item.documentation = new vscode.MarkdownString(
+              formatOysterCommandPreview(cmd, spec),
+            );
             item.insertText = cmd;
             item.commitCharacters = ["["];
             return item;
@@ -254,8 +254,7 @@ export function activate(context: vscode.ExtensionContext) {
           const params = [...spec.required, ...spec.optional];
           const sig = new vscode.SignatureInformation(
             cmd + " [" + params.map((p) => p.name).join(", ") + "]",
-            spec.description +
-              `\nSupported Oyster versions: ≥ ${spec.introducedVersion}`,
+            new vscode.MarkdownString(formatOysterCommandPreview(cmd, spec)),
           );
           sig.parameters = params.map(
             (p) => new vscode.ParameterInformation(p.name, p.description),
