@@ -10,6 +10,10 @@ export const GameAliases: Map<string, string[]> = new Map([
     "Speed Dating for the Socially Inept",
     ["Speed Dating for the Socially Inept", "IneptDateGame"],
   ],
+  [
+    "Speed Dating for the Socially Inept (4.0.0)",
+    ["Speed Dating for the Socially Inept", "IneptDateGame"],
+  ],
 ]);
 
 /**
@@ -20,7 +24,11 @@ export const commands: CommandMap = {
     description: "Appends the given text to the end of the main text box.",
     introducedVersion: "4.0.0",
     docUrl: "base/act_append",
-    compatibleGames: ["Base"],
+    compatibleGames: [
+      "Base",
+      "Speed Dating for the Socially Inept",
+      "Christmas at Greyling Grove",
+    ],
     required: [
       {
         name: "Parameter1",
@@ -57,7 +65,11 @@ export const commands: CommandMap = {
       "Replaces the contents of the main text box with the given text.",
     introducedVersion: "4.0.0",
     docUrl: "base/act_speak",
-    compatibleGames: ["Base"],
+    compatibleGames: [
+      "Base",
+      "Speed Dating for the Socially Inept",
+      "Christmas at Greyling Grove",
+    ],
     required: [
       {
         name: "Parameter1",
@@ -109,7 +121,11 @@ export const commands: CommandMap = {
       "Moves the current line-number to the line-number described by the line of the given name (implemented via Line_Marker), or does nothing if the given Line_Marker does not exist.",
     introducedVersion: "4.0.0",
     docUrl: "base/jump_to",
-    compatibleGames: ["Base"],
+    compatibleGames: [
+      "Base",
+      "Speed Dating for the Socially Inept",
+      "Christmas at Greyling Grove",
+    ],
     required: [
       {
         name: "Parameter1",
@@ -125,7 +141,11 @@ export const commands: CommandMap = {
       "Informs the speech system that this line should be tracked as a line marker, by the given name.",
     introducedVersion: "4.0.0",
     docUrl: "base/line_marker",
-    compatibleGames: ["Base"],
+    compatibleGames: [
+      "Base",
+      "Speed Dating for the Socially Inept",
+      "Christmas at Greyling Grove",
+    ],
     required: [
       {
         name: "Parameter1",
@@ -140,7 +160,11 @@ export const commands: CommandMap = {
       "This command is never actually seen by the conversation. Its entire purpose is to provide optional info to the implementation of Oyster running the script so that it can handle the script accordingly (Whether that be logging incompatibility as a warning or emulating Oyster features exclusive to that version is up to the implementation).",
     introducedVersion: "4.0.1",
     docUrl: "base/meta",
-    compatibleGames: ["Base"],
+    compatibleGames: [
+      "Base",
+      "Speed Dating for the Socially Inept",
+      "Christmas at Greyling Grove",
+    ],
     required: [],
     optional: [
       {
@@ -179,7 +203,7 @@ export const commands: CommandMap = {
   },
   Set_Colour: {
     description:
-      "Sets the colour of the character’s name to the parameters specified in one frame.\n\nIf all parameters are passed as -1, then Oyster resets the text colour to its original value from the start of the conversation.",
+      "Sets the colour of the character's name to the parameters specified in one frame.\n\nIf all parameters are passed as -1, then Oyster resets the text colour to its original value from the start of the conversation.",
     introducedVersion: "4.1.0",
     docUrl: "base/set_colour",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
@@ -213,7 +237,7 @@ export const commands: CommandMap = {
   },
   Set_FOV: {
     description:
-      "Updates Oyster’s ‘Target FOV’ value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.",
+      "Updates Oyster's 'Target FOV' value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.",
     introducedVersion: "4.1.0",
     docUrl: "base/set_fov",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
