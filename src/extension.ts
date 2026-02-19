@@ -34,6 +34,24 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  // Register a command to run the active Oyster script with the simple interpreter
+  context.subscriptions.push(
+    vscode.commands.registerCommand("oyster.runScript", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage("No active editor to run.");
+        return;
+      }
+      const doc = editor.document;
+      if (doc.languageId !== "oyster") {
+        vscode.window.showInformationMessage("Active file is not an Oyster script.");
+        return;
+      }
+      const runner = await import("./interpreter/index");
+      await runner.runDocument(doc);
+    }),
+  );
+
   /**
    * Provides hover documentation for Oyster 4S commands in Oyster files.
    * Shows a summary of each command and its parameters when hovering over the command name.
