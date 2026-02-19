@@ -37,6 +37,13 @@
         "path": "./syntaxes/oyster.tmLanguage.json"
       }
     ]
+    ,
+    "commands": [
+      {
+        "command": "oyster.runScript",
+        "title": "Run Oyster Script"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
