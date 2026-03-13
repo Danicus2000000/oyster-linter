@@ -21,7 +21,8 @@ export const GameAliases: Map<string, string[]> = new Map([
  */
 export const commands: CommandMap = {
   Act_Append: {
-    description: "Appends the given text to the end of the main text box.",
+    description:
+      "Appends the given text to the end of the main text box.\n\nWhen not muted, plays back a random sound from the character's `CharacterSound` component at a fixed rate while text is being pushed. Defaults to 2.5x the rate at which characters are pushed to the text display. Setting the integer variable `mumblesPerSecond` earlier in the script than an act command will override this default behaviour such that the time between sounds is one divided by `mumblesPerSecond`.",
     introducedVersion: "4.0.0",
     docUrl: "base/act_append",
     compatibleGames: ["Base"],
@@ -58,7 +59,7 @@ export const commands: CommandMap = {
   },
   Act_Speak: {
     description:
-      "Replaces the contents of the main text box with the given text.",
+      "Replaces the contents of the main text box with the given text.\n\nWhen not muted, plays back a random sound from the character's `CharacterSound` component at a fixed rate while text is being pushed. Defaults to 2.5x the rate at which characters are pushed to the text display. Setting the integer variable `mumblesPerSecond` earlier in the script than an act command will override this default behaviour such that the time between sounds is one divided by `mumblesPerSecond`.",
     introducedVersion: "4.0.0",
     docUrl: "base/act_speak",
     compatibleGames: ["Base"],
@@ -95,8 +96,8 @@ export const commands: CommandMap = {
   },
   Call_Puppet: {
     description:
-      "A command for when you are too lazy to write a new command. Allows for a string to be passed, where when the command is run, an event within Oyster is called with that string passed to it. From that there should be a script within the game that is listening for that event, which will then use that string to decide what to do.",
-    introducedVersion: "4.1.0",
+      "A command for when you are too lazy to write a new command. Allows for a string to be passed, where when the command is run, an event within Oyster is called with that string passed to it. From that there should be a script within the game that is listening for that event, which will then use that string to decide what to do.\n\nThe event is raised once per time the command is encountered.",
+    introducedVersion: "4.0.1",
     docUrl: "base/call_puppet",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -141,7 +142,7 @@ export const commands: CommandMap = {
   },
   Meta: {
     description:
-      "This command is never actually seen by the conversation. Its entire purpose is to provide optional info to the implementation of Oyster running the script so that it can handle the script accordingly (Whether that be logging incompatibility as a warning or emulating Oyster features exclusive to that version is up to the implementation).",
+      "This command is never actually seen by the conversation. Its entire purpose is to provide optional info to the implementation of Oyster running the script so that it can handle the script accordingly (Whether that be logging incompatibility as a warning or emulating Oyster features exclusive to that version is up to the implementation).\n\nIt’s also important to note that multiple 'meta' commands can be written in one script file and that there is no obligation for the 'meta' command to occur first in the script file.",
     introducedVersion: "4.0.1",
     docUrl: "base/meta",
     compatibleGames: ["Base"],
@@ -184,7 +185,7 @@ export const commands: CommandMap = {
   Set_Colour: {
     description:
       "Sets the colour of the character's name to the parameters specified in one frame.\n\nIf all parameters are passed as -1, then Oyster resets the text colour to its original value from the start of the conversation.",
-    introducedVersion: "4.1.0",
+    introducedVersion: "4.0.1",
     docUrl: "base/set_colour",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -218,7 +219,7 @@ export const commands: CommandMap = {
   Set_FOV: {
     description:
       "Updates Oyster's 'Target FOV' value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.",
-    introducedVersion: "4.1.0",
+    introducedVersion: "4.0.1",
     docUrl: "base/set_fov",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -253,7 +254,7 @@ export const commands: CommandMap = {
   Set_Looker: {
     description:
       "Attempts to swap the current look target to the object of the given name, if the target object is not present, it does nothing, if the value **default** is passed, it returns to the original look target always.",
-    introducedVersion: "4.1.0",
+    introducedVersion: "4.0.1",
     docUrl: "base/set_looker",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -283,7 +284,7 @@ export const commands: CommandMap = {
   },
   Set_Script: {
     description:
-      "Changes the script that the current character is pointing to to the given value, intended to allow for characters to change conversation between chats or based on given events. **Does not reload the script after being called, player has to manually re-enter conversation, nor does it cause the current conversation to end**.",
+      "Changes the script that the current character is pointing to to the given value, intended to allow for characters to change conversation between chats or based on given events. **Does not reload the script after being called, player has to manually re-enter conversation, nor does it cause the current conversation to end**.\n\nSupplying a blank string as the parameter causes the character to go to the script prior to their current one, or the script they are already using, if there is no prior script.",
     introducedVersion: "4.0.0",
     docUrl: "base/set_script",
     compatibleGames: ["Base"],
