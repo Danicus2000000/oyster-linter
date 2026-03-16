@@ -240,9 +240,11 @@ export function lintOysterDocument(
     // introducedVersion defaults to the base game version but if a specfic metaGame is present and has a specific version, use that instead
     if (metaVersion && spec.introducedVersion) {
       let versionToCheck = spec.introducedVersion.get("Base");
+      let game: string = "Base";
       if (metaGame && metaGame !== "Base") {
         const gameSpecificVersion = spec.introducedVersion.get(metaGame);
         if (gameSpecificVersion) {
+          game = getCanonicalGame(metaGame) ?? metaGame;
           versionToCheck = gameSpecificVersion;
         }
       }
@@ -258,7 +260,7 @@ export function lintOysterDocument(
           diagnostics.push(
             new vscode.Diagnostic(
               line.range,
-              `Command ${cmd} was introduced in Oyster ${versionToCheck} which is newer than script version ${metaVersion}`,
+              `Command ${cmd} was introduced in Oyster ${versionToCheck} for game type ${game} which is newer than script version ${metaVersion}`,
               vscode.DiagnosticSeverity.Warning,
             ),
           );
