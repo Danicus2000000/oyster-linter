@@ -8,11 +8,11 @@ export const GameAliases: Map<string, string[]> = new Map([
   ["Christmas at Greyling Grove", ["Christmas at Greyling Grove", "GroveGame"]],
   [
     "Speed Dating for the Socially Inept",
-    ["Speed Dating for the Socially Inept", "IneptDateGame"],
-  ],
-  [
-    "Speed Dating for the Socially Inept (4.0.0)",
-    ["Speed Dating for the Socially Inept", "IneptDateGame"],
+    [
+      "Speed Dating for the Socially Inept",
+      "Speed Dating for the Socially Inept (4.0.0)",
+      "IneptDateGame",
+    ],
   ],
 ]);
 
@@ -99,10 +99,10 @@ export const commands: CommandMap = {
       "A command for when you are too lazy to write a new command. Allows for a string to be passed, where when the command is run, an event within Oyster is called with that string passed to it. From that there should be a script within the game that is listening for that event, which will then use that string to decide what to do.\n\nThe event is raised once per time the command is encountered.",
     introducedVersion: new Map([
       ["Base", "4.1.0"],
-      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+      ["Speed Dating for the Socially Inept", "4.0.0"],
     ]),
     docUrl: "base/call_puppet",
-    compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
+    compatibleGames: ["Base", "Speed Dating for the Socially Inept"],
     required: [
       {
         name: "Parameter1",
@@ -190,10 +190,10 @@ export const commands: CommandMap = {
       "Sets the colour of the character's name to the parameters specified in one frame.\n\nIf all parameters are passed as -1, then Oyster resets the text colour to its original value from the start of the conversation.",
     introducedVersion: new Map([
       ["Base", "4.1.0"],
-      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+      ["Speed Dating for the Socially Inept", "4.0.0"],
     ]),
     docUrl: "base/set_colour",
-    compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
+    compatibleGames: ["Base", "Speed Dating for the Socially Inept"],
     required: [
       {
         name: "Parameter1",
@@ -227,10 +227,10 @@ export const commands: CommandMap = {
       "Updates Oyster's 'Target FOV' value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.",
     introducedVersion: new Map([
       ["Base", "4.1.0"],
-      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+      ["Speed Dating for the Socially Inept", "4.0.0"],
     ]),
     docUrl: "base/set_fov",
-    compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
+    compatibleGames: ["Base", "Speed Dating for the Socially Inept"],
     required: [
       {
         name: "Parameter1",
@@ -265,10 +265,10 @@ export const commands: CommandMap = {
       "Attempts to swap the current look target to the object of the given name, if the target object is not present, it does nothing, if the value **default** is passed, it returns to the original look target always.",
     introducedVersion: new Map([
       ["Base", "4.1.0"],
-      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+      ["Speed Dating for the Socially Inept", "4.0.0"],
     ]),
     docUrl: "base/set_looker",
-    compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
+    compatibleGames: ["Base", "Speed Dating for the Socially Inept"],
     required: [
       {
         name: "Parameter1",
@@ -517,7 +517,7 @@ export const commands: CommandMap = {
         type: "bool",
         default: false,
         description:
-          "A boolean value, when set to true, the character’s affection is increased by only half a point. Defaults to false.",
+          "A boolean value, when set to true, the character's affection is increased by only half a point. Defaults to false.",
       },
     ],
   },
