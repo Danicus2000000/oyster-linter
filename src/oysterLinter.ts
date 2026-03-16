@@ -22,6 +22,11 @@ function parseValue(str: string, type: CommandParam["type"]): boolean {
   return false;
 }
 
+/**
+ * Gets the canonical game name for a given alias, or returns the original name if no match is found.
+ * @param name The name of the game to canonicalize.
+ * @returns The canonical game name if an alias match is found, or the original name if no match is found or if the input is undefined.
+ */
 function getCanonicalGame(name: string | undefined): string | undefined {
   if (!name) return undefined;
   for (const [canon, aliases] of GameAliases) {
@@ -31,6 +36,11 @@ function getCanonicalGame(name: string | undefined): string | undefined {
   return name;
 }
 
+/**
+ * Converts a version string to a number.
+ * @param v The version string to convert.
+ * @returns The numeric representation of the version, or undefined if conversion fails.
+ */
 function versionToNumber(v: string | undefined): number | undefined {
   if (!v) return undefined;
   const cleaned = v.replace(/\./g, "");
@@ -240,11 +250,11 @@ export function lintOysterDocument(
     // introducedVersion defaults to the base game version but if a specfic metaGame is present and has a specific version, use that instead
     if (metaVersion && spec.introducedVersion) {
       let versionToCheck = spec.introducedVersion.get("Base");
-      let game: string = "Base";
+      let game = metaGame ?? "Base";
       if (metaGame && metaGame !== "Base") {
-        const gameSpecificVersion = spec.introducedVersion.get(metaGame);
+        game = getCanonicalGame(metaGame) ?? metaGame;
+        const gameSpecificVersion = spec.introducedVersion.get(game);
         if (gameSpecificVersion) {
-          game = getCanonicalGame(metaGame) ?? metaGame;
           versionToCheck = gameSpecificVersion;
         }
       }
@@ -274,7 +284,7 @@ export function lintOysterDocument(
       spec.compatibleGames.length > 0 &&
       !spec.compatibleGames.includes("Base")
     ) {
-      const canonicalTarget = getCanonicalGame(metaGame);
+      const canonicalTarget = getCanonicalGame(metaGame) ?? metaGame;
       if (
         canonicalTarget &&
         !spec.compatibleGames.find((g) => g === canonicalTarget)
