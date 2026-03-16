@@ -237,17 +237,32 @@ export function lintOysterDocument(
     }
     // If meta info present, check version and target game compatibility
     // metaGame/metaVersion are the last-seen values from the first pass
+    // introducedVersion defaults to the base game version but if a specfic metaGame is present and has a specific version, use that instead
     if (metaVersion && spec.introducedVersion) {
-      const specVer = versionToNumber(spec.introducedVersion);
-      const fileVer = versionToNumber(metaVersion);
-      if (specVer !== undefined && fileVer !== undefined && specVer > fileVer) {
-        diagnostics.push(
-          new vscode.Diagnostic(
-            line.range,
-            `Command ${cmd} was introduced in Oyster ${spec.introducedVersion} which is newer than script version ${metaVersion}`,
-            vscode.DiagnosticSeverity.Warning,
-          ),
-        );
+      let versionToCheck = spec.introducedVersion.get("Base");
+      if (metaGame && metaGame !== "Base") {
+        const gameSpecificVersion = spec.introducedVersion.get(metaGame);
+        if (gameSpecificVersion) {
+          versionToCheck = gameSpecificVersion;
+        }
+      }
+
+      if (versionToCheck) {
+        const specVer = versionToNumber(versionToCheck);
+        const fileVer = versionToNumber(metaVersion);
+        if (
+          specVer !== undefined &&
+          fileVer !== undefined &&
+          specVer > fileVer
+        ) {
+          diagnostics.push(
+            new vscode.Diagnostic(
+              line.range,
+              `Command ${cmd} was introduced in Oyster ${versionToCheck} which is newer than script version ${metaVersion}`,
+              vscode.DiagnosticSeverity.Warning,
+            ),
+          );
+        }
       }
     }
 

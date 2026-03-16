@@ -23,7 +23,7 @@ export const commands: CommandMap = {
   Act_Append: {
     description:
       "Appends the given text to the end of the main text box.\n\nWhen not muted, plays back a random sound from the character's `CharacterSound` component at a fixed rate while text is being pushed. Defaults to 2.5x the rate at which characters are pushed to the text display. Setting the integer variable `mumblesPerSecond` earlier in the script than an act command will override this default behaviour such that the time between sounds is one divided by `mumblesPerSecond`.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/act_append",
     compatibleGames: ["Base"],
     required: [
@@ -60,7 +60,7 @@ export const commands: CommandMap = {
   Act_Speak: {
     description:
       "Replaces the contents of the main text box with the given text.\n\nWhen not muted, plays back a random sound from the character's `CharacterSound` component at a fixed rate while text is being pushed. Defaults to 2.5x the rate at which characters are pushed to the text display. Setting the integer variable `mumblesPerSecond` earlier in the script than an act command will override this default behaviour such that the time between sounds is one divided by `mumblesPerSecond`.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/act_speak",
     compatibleGames: ["Base"],
     required: [
@@ -97,7 +97,10 @@ export const commands: CommandMap = {
   Call_Puppet: {
     description:
       "A command for when you are too lazy to write a new command. Allows for a string to be passed, where when the command is run, an event within Oyster is called with that string passed to it. From that there should be a script within the game that is listening for that event, which will then use that string to decide what to do.\n\nThe event is raised once per time the command is encountered.",
-    introducedVersion: "4.0.1",
+    introducedVersion: new Map([
+      ["Base", "4.1.0"],
+      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+    ]),
     docUrl: "base/call_puppet",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -112,7 +115,7 @@ export const commands: CommandMap = {
   Jump_To: {
     description:
       "Moves the current line-number to the line-number described by the line of the given name (implemented via Line_Marker), or does nothing if the given Line_Marker does not exist.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/jump_to",
     compatibleGames: ["Base"],
     required: [
@@ -128,7 +131,7 @@ export const commands: CommandMap = {
   Line_Marker: {
     description:
       "Informs the speech system that this line should be tracked as a line marker, by the given name.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/line_marker",
     compatibleGames: ["Base"],
     required: [
@@ -143,7 +146,7 @@ export const commands: CommandMap = {
   Meta: {
     description:
       "This command is never actually seen by the conversation. Its entire purpose is to provide optional info to the implementation of Oyster running the script so that it can handle the script accordingly (Whether that be logging incompatibility as a warning or emulating Oyster features exclusive to that version is up to the implementation).\n\nIt’s also important to note that multiple 'meta' commands can be written in one script file and that there is no obligation for the 'meta' command to occur first in the script file.",
-    introducedVersion: "4.0.1",
+    introducedVersion: new Map([["Base", "4.0.1"]]),
     docUrl: "base/meta",
     compatibleGames: ["Base"],
     required: [],
@@ -165,7 +168,7 @@ export const commands: CommandMap = {
   Set_BoolVar: {
     description:
       "Declares a variable with the given value. If the variable already exists, then it updates the value of the variable to the given value. When updating the value of a variable, the type must be the same as the original value, or else this command will skip updating the value.",
-    introducedVersion: "4.1.0",
+    introducedVersion: new Map([["Base", "4.1.0"]]),
     docUrl: "base/set_boolvar",
     compatibleGames: ["Base"],
     required: [
@@ -185,7 +188,10 @@ export const commands: CommandMap = {
   Set_Colour: {
     description:
       "Sets the colour of the character's name to the parameters specified in one frame.\n\nIf all parameters are passed as -1, then Oyster resets the text colour to its original value from the start of the conversation.",
-    introducedVersion: "4.0.1",
+    introducedVersion: new Map([
+      ["Base", "4.1.0"],
+      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+    ]),
     docUrl: "base/set_colour",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -219,7 +225,10 @@ export const commands: CommandMap = {
   Set_FOV: {
     description:
       "Updates Oyster's 'Target FOV' value, given the new value is different, Oyster will lerp to the new FOV value quickly while running other commands.",
-    introducedVersion: "4.0.1",
+    introducedVersion: new Map([
+      ["Base", "4.1.0"],
+      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+    ]),
     docUrl: "base/set_fov",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -234,7 +243,7 @@ export const commands: CommandMap = {
   Set_IntVar: {
     description:
       "Declares a variable with the given value. If the variable already exists, then it updates the value of the variable to the given value. When updating the value of a variable, the type must be the same as the original value, or else this command will skip updating the value.",
-    introducedVersion: "4.1.0",
+    introducedVersion: new Map([["Base", "4.1.0"]]),
     docUrl: "base/set_intvar",
     compatibleGames: ["Base"],
     required: [
@@ -254,7 +263,10 @@ export const commands: CommandMap = {
   Set_Looker: {
     description:
       "Attempts to swap the current look target to the object of the given name, if the target object is not present, it does nothing, if the value **default** is passed, it returns to the original look target always.",
-    introducedVersion: "4.0.1",
+    introducedVersion: new Map([
+      ["Base", "4.1.0"],
+      ["Speed Dating for the Socially Inept (4.0.0)", "4.0.0"],
+    ]),
     docUrl: "base/set_looker",
     compatibleGames: ["Base", "Speed Dating for the Socially Inept (4.0.0)"],
     required: [
@@ -269,7 +281,7 @@ export const commands: CommandMap = {
   Set_Name: {
     description:
       "Changes the value of the name display in the conversation to the given name. **Does not change the name of the character beyond the scope of the current conversation**. Is intended to be used to spoof multiple characters, alongside Set_Looker.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/set_name",
     compatibleGames: ["Base"],
     required: [
@@ -285,7 +297,7 @@ export const commands: CommandMap = {
   Set_Script: {
     description:
       "Changes the script that the current character is pointing to to the given value, intended to allow for characters to change conversation between chats or based on given events. **Does not reload the script after being called, player has to manually re-enter conversation, nor does it cause the current conversation to end**.\n\nSupplying a blank string as the parameter causes the character to go to the script prior to their current one, or the script they are already using, if there is no prior script.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/set_script",
     compatibleGames: ["Base"],
     required: [
@@ -301,7 +313,7 @@ export const commands: CommandMap = {
   Set_sprite: {
     description:
       "Changes the current sprite to the one described by the above parameter, if the sprite does not exist, should swap to an error sprite.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/set_sprite",
     compatibleGames: ["Base"],
     required: [
@@ -316,7 +328,7 @@ export const commands: CommandMap = {
   Set_StringVar: {
     description:
       "Declares a variable with the given value. If the variable already exists, then it updates the value of the variable to the given value. When updating the value of a variable, the type must be the same as the original value, or else this command will skip updating the value.",
-    introducedVersion: "4.1.0",
+    introducedVersion: new Map([["Base", "4.1.0"]]),
     docUrl: "base/set_stringvar",
     compatibleGames: ["Base"],
     required: [
@@ -336,7 +348,7 @@ export const commands: CommandMap = {
   Sys_Wait: {
     description:
       "Waits for the given amount of time, or skips on player input, if that parameter is set.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Base", "4.0.0"]]),
     docUrl: "base/sys_wait",
     compatibleGames: ["Base"],
     required: [
@@ -359,7 +371,7 @@ export const commands: CommandMap = {
   Check_Has: {
     description:
       "Checks whether the given character 'has' the given item, as in whether the player has delivered this item to them. Jumps to the respective line markers for whether the check passes or fails.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/check_has",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [
@@ -392,7 +404,7 @@ export const commands: CommandMap = {
   Check_Win: {
     description:
       "A very hardcoded command that simply checks if a certain number of presents have been delivered. Given that a certain number of presents have been delivered, the script is jumped to the line marker named by 'Parameter1'. Otherwise, jumps to the line marker described by 'Parameter2'.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/check_win",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [
@@ -414,7 +426,7 @@ export const commands: CommandMap = {
   Deliver_Gift: {
     description:
       "Marks the named gift as being delivered to the named person. This marking is what is checked by 'Check_Has' and 'Check_Win'.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/deliver_gift",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [
@@ -436,7 +448,7 @@ export const commands: CommandMap = {
   Drop_Item: {
     description:
       "Causes the player to drop their currently held item. If 'onplayer' is not set to true, then the item spawns out of bounds.\n\nIn games with a concept similar to Greyling Grove's 'Lost N Found', this command cannot act as a 'delete item' command, as the 'Lost N Found' would still bring the item back into bounds when used.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/drop_item",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [],
@@ -453,7 +465,7 @@ export const commands: CommandMap = {
   Give_Item: {
     description:
       "Attempts to give the player the named item, given that the player cannot accept the item due to a full inventory, the player will be forced to drop their current item into the world to make room for the new item.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/give_item",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [
@@ -468,7 +480,7 @@ export const commands: CommandMap = {
   Set_Achievement: {
     description:
       "Unlocks the achievement, given it exists. Achievements with multiple unlock conditions are not supported (kind of).\n\nIn Greyling Grove, the achievement implementation allows for achievements to have 'requirements', which themselves are like hidden achievements, which can be used to create achievements that require multiple conditions or for something to happen multiple times.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/set_achievement",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [
@@ -484,7 +496,7 @@ export const commands: CommandMap = {
   Start_Credits: {
     description:
       "Instantly moves the game to the credits scene. Implemented as a hack to let Johny trigger the ending credits in Greyling Grove.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([["Christmas at Greyling Grove", "4.0.0"]]),
     docUrl: "grovegame/start_credits",
     compatibleGames: ["Christmas at Greyling Grove"],
     required: [],
@@ -493,7 +505,9 @@ export const commands: CommandMap = {
   Inc_Affection: {
     description:
       "Increases the affection of the character currently in conversation by one point, or by half a point if the optional parameter is provided.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([
+      ["Speed Dating for the Socially Inept", "4.0.0"],
+    ]),
     docUrl: "ineptdategame/inc_affection",
     compatibleGames: ["Speed Dating for the Socially Inept"],
     required: [],
@@ -510,7 +524,9 @@ export const commands: CommandMap = {
   Show_Options: {
     description:
       "This command is a weird one. The definition of required and optional parameter get a bit grey here, so pay close attention to the description of the parameters to know how to write it.\n\nWhen called, this command will cause a set of options to appear, and will pause script execution until the player selects an option.",
-    introducedVersion: "4.0.0",
+    introducedVersion: new Map([
+      ["Speed Dating for the Socially Inept", "4.0.0"],
+    ]),
     docUrl: "ineptdategame/show_options",
     compatibleGames: ["Speed Dating for the Socially Inept"],
     required: [
