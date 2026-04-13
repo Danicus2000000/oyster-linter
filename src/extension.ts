@@ -484,7 +484,7 @@ function formatOysterCommandPreview(
   md += `\n\n${commandSpec.description}`;
   md += `\n\nSupported Oyster versions: ≥ ${commandSpec.introducedVersion}`;
   md +=
-    "\n\nFor more information on this command [check the documentation](https://oyster.abulman.com/supportedcommands/" +
+    "\n\nFor more information on this command [check the documentation](https://oyster.abulman.com/writing/supportedcommands/" +
     commandSpec.docUrl +
     ").";
   if (commandSpec.required.length > 0) {
