@@ -4,9 +4,9 @@
   "description": "Lints Oyster 4S scripts for syntax and command errors.",
   "icon": "img/oysterIcon.png",
   "publisher": "AnActualPan",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "engines": {
-    "vscode": "^1.116.0"
+    "vscode": "^1.118.0"
   },
   "categories": [
     "Linters"
