@@ -56,5 +56,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Danicus2000000/oyster-linter.git"
+  },
+  "allowScripts": {
+    "@vscode/vsce-sign@2.0.6": true,
+    "keytar@7.9.0": true
   }
 }
