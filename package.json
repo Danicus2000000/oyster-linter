@@ -6,7 +6,7 @@
   "publisher": "AnActualPan",
   "version": "2.2.4",
   "engines": {
-    "vscode": "^1.140.0"
+    "vscode": "^1.146.0"
   },
   "categories": [
     "Linters"
@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
-    "@types/vscode": "^1.145.0",
+    "@types/vscode": "^1.146.0",
     "@vscode/vsce": "^4.1.0",
     "clean-webpack-plugin": "^4.0.0",
     "path": "^0.12.7",
